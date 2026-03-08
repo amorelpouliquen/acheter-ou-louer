@@ -1213,6 +1213,29 @@ function App() {
                 </SectionCard>
               </aside>
             </div>
+
+            <footer className="flex flex-col gap-2 border-t border-slate-800 pt-4 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+              <p>
+                Merci a Chicago Boy{' '}
+                <a
+                  href="https://x.com/ChicagoBoyFR"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-cyan-300 transition hover:text-cyan-200"
+                >
+                  @ChicagoBoyFR
+                </a>{' '}
+                pour l'inspiration.
+              </p>
+              <a
+                href="https://github.com/amorelpouliquen/acheter-ou-louer"
+                target="_blank"
+                rel="noreferrer"
+                className="font-medium text-slate-200 transition hover:text-cyan-300"
+              >
+                Voir le repo GitHub
+              </a>
+            </footer>
           </div>
         </div>
       </div>
