@@ -37,8 +37,8 @@ const BASE_INPUT_GROUPS = [
   {
     title: 'Bien',
     fields: [
-      ['scenarioName', 'Nom du scenario', 'text'],
-      ['surfaceSqm', 'Surface (m2)', 'number'],
+      ['scenarioName', 'Nom du scénario', 'text'],
+      ['surfaceSqm', 'Surface (m²)', 'number'],
       ['horizonYears', 'Horizon (ans)', 'number'],
     ],
   },
@@ -46,16 +46,16 @@ const BASE_INPUT_GROUPS = [
     title: 'Financement',
     fields: [
       ['downPayment', 'Apport', 'number'],
-      ['mortgageRate', 'Taux credit (%)', 'number'],
-      ['loanDurationYears', 'Duree credit (ans)', 'number'],
+      ['mortgageRate', 'Taux crédit (%)', 'number'],
+      ['loanDurationYears', 'Durée du crédit (ans)', 'number'],
       ['agencyFeePercent', 'Frais agence (%)', 'number'],
       ['notaryFeePercent', 'Frais notaire (%)', 'number'],
     ],
   },
   {
-    title: 'Hypotheses',
+    title: 'Hypothèses',
     fields: [
-      ['yearlyPropertyTax', 'Taxe fonciere / an', 'number'],
+      ['yearlyPropertyTax', 'Taxe foncière / an', 'number'],
       ['yearlyMaintenanceBudget', 'Entretien / an', 'number'],
       ['ownerMonthlyCharges', 'Charges proprio / mois', 'number'],
       ['renterMonthlyCharges', 'Charges locataire / mois', 'number'],
@@ -68,12 +68,12 @@ const BASE_INPUT_GROUPS = [
 
 const PRICE_MODE_FIELDS = {
   [PRICING_MODES.total]: [
-    ['purchasePrice', "Prix d'achat", 'number'],
+    ['purchasePrice', 'Prix d’achat', 'number'],
     ['monthlyRent', 'Loyer mensuel', 'number'],
   ],
   [PRICING_MODES.sqm]: [
-    ['purchasePricePerSqm', 'Prix achat / m2', 'number'],
-    ['monthlyRentPerSqm', 'Loyer / m2 / mois', 'number'],
+      ['purchasePricePerSqm', 'Prix d’achat / m²', 'number'],
+      ['monthlyRentPerSqm', 'Loyer / m² / mois', 'number'],
   ],
 }
 
@@ -608,7 +608,7 @@ function TimelineChart({ points, crossoverYear }) {
           Location nette
         </div>
         <div className="ml-auto text-slate-500">
-          {crossoverYear ? `Croisement vers annee ${crossoverYear}` : 'Pas de croisement sur l horizon'}
+          {crossoverYear ? `Croisement vers l’année ${crossoverYear}` : 'Pas de croisement sur l’horizon.'}
         </div>
       </div>
 
@@ -768,32 +768,32 @@ function App() {
   const buyWins = scenario.advantage > 0
   const purchaseTooltips = {
     purchasePrice:
-      "Le prix affiche la valeur du logement au depart. Ce n'est pas une depense perdue a 100 % : si vous revendez, vous recupererez une partie de cette valeur.",
+      "Le prix affiche la valeur du logement au départ. Ce n’est pas une dépense perdue à 100 % : si vous revendez, vous récupérerez une partie de cette valeur.",
     acquisitionFees:
-      "Ce sont les frais payes au moment de l'achat, surtout notaire et agence. En pratique, cet argent sort tout de suite et n'est en general pas recupere plus tard.",
-    interestPaid: `C'est la part des mensualites versee a la banque pour remunerer le credit sur ${inputs.horizonYears} ans observes. Contrairement au capital rembourse, cette somme ne vous appartient plus.`,
+      "Ce sont les frais payés au moment de l’achat, surtout notaire et agence. En pratique, cet argent sort tout de suite et n’est en général pas récupéré plus tard.",
+    interestPaid: `C’est la part des mensualités versée à la banque pour rémunérer le crédit sur ${inputs.horizonYears} ans observés. Contrairement au capital remboursé, cette somme ne vous appartient plus.`,
     ownerChargesTotal:
-      "C'est tout ce que coute le fait de posseder le bien au quotidien : charges de copropriete, taxe fonciere et budget d'entretien.",
-    investedCapitalGain: `C'est ce que votre apport aurait pu vous rapporter s'il etait place ailleurs a ${formatNumber(inputs.opportunityReturn)} % par an. On le compte comme un cout car cet argent n'a pas pu travailler pendant l'achat.`,
+      "C’est tout ce que coûte le fait de posséder le bien au quotidien : charges de copropriété, taxe foncière et budget d’entretien.",
+    investedCapitalGain: `C’est ce que votre apport aurait pu vous rapporter s’il était placé ailleurs à ${formatNumber(inputs.opportunityReturn)} % par an. On le compte comme un coût car cet argent n’a pas pu travailler pendant l’achat.`,
     remainingBalance:
-      "C'est la somme qu'il reste a rembourser a la banque a la fin de la periode choisie. Si vous revendez avant la fin du credit, cette somme doit etre reglee avec le prix de vente.",
-    ownerNetCost: `C'est ce que l'achat vous coute vraiment sur ${inputs.horizonYears} ans. Le simulateur additionne les frais, interets, charges et cout d'opportunite, puis retire le patrimoine net recupere a la fin, ici ${formatCurrency(scenario.equityRecovered)}.`,
+      "C’est la somme qu’il reste à rembourser à la banque à la fin de la période choisie. Si vous revendez avant la fin du crédit, cette somme doit être réglée avec le prix de vente.",
+    ownerNetCost: `C’est ce que l’achat vous coûte vraiment sur ${inputs.horizonYears} ans. Le simulateur additionne les frais, intérêts, charges et coût d’opportunité, puis retire le patrimoine net récupéré à la fin, ici ${formatCurrency(scenario.equityRecovered)}.`,
     downPayment:
-      "C'est l'argent sorti de votre poche au depart pour acheter. En pratique, c'est votre epargne immobilisee dans le projet.",
+      "C’est l’argent sorti de votre poche au départ pour acheter. En pratique, c’est votre épargne immobilisée dans le projet.",
     loanPrincipal:
-      "C'est la somme reellement pretee par la banque apres prise en compte de l'apport.",
+      "C’est la somme réellement prêtée par la banque après prise en compte de l’apport.",
     principalPaid:
-      "C'est la partie du credit deja remboursee qui fait baisser votre dette. Ce n'est pas un frais bancaire : cela augmente votre part de propriete dans le bien.",
+      "C’est la partie du crédit déjà remboursée qui fait baisser votre dette. Ce n’est pas un frais bancaire : cela augmente votre part de propriété dans le bien.",
   }
   const rentalTooltips = {
-    totalRentPaid: `C'est le total des loyers payes sur ${inputs.horizonYears} ans, en tenant compte de l'inflation des loyers definie dans les parametres.`,
+    totalRentPaid: `C’est le total des loyers payés sur ${inputs.horizonYears} ans, en tenant compte de l’inflation des loyers définie dans les paramètres.`,
     renterChargesTotal:
-      "C'est le total des charges supportees en tant que locataire sur toute la periode.",
-    renterInvestmentGain: `Comme vous n'achetez pas, votre apport peut rester place. Ici, c'est le gain cumule estime sur ce capital a ${formatNumber(inputs.opportunityReturn)} % par an.`,
+      "C’est le total des charges supportées en tant que locataire sur toute la période.",
+    renterInvestmentGain: `Comme vous n’achetez pas, votre apport peut rester placé. Ici, c’est le gain cumulé estimé sur ce capital à ${formatNumber(inputs.opportunityReturn)} % par an.`,
     rentNetCost:
-      "C'est ce que la location vous coute vraiment : loyers + charges, moins le gain produit par le capital que vous avez pu laisser place.",
+      "C’est ce que la location vous coûte vraiment : loyers + charges, moins le gain produit par le capital que vous avez pu laisser placé.",
     renterInvestedCapital:
-      "C'est le capital que le locataire garde disponible et peut placer au lieu de le mobiliser dans l'achat.",
+      "C’est le capital que le locataire garde disponible et peut placer au lieu de le mobiliser dans l’achat.",
   }
 
   function updateInput(key, value) {
@@ -807,7 +807,7 @@ function App() {
   function saveScenario() {
     const entry = {
       id: crypto.randomUUID(),
-      name: inputs.scenarioName.trim() || `Scenario ${savedScenarios.length + 1}`,
+      name: inputs.scenarioName.trim() || `Scénario ${savedScenarios.length + 1}`,
       createdAt: new Date().toISOString(),
       inputs,
       results: scenario,
@@ -842,10 +842,10 @@ function App() {
                 Comparateur immobilier
               </div>
               <h1 className="mt-1 text-xl font-semibold text-slate-50">
-                Louer ou acheter - Simulateur
+                Louer ou acheter : simulateur
               </h1>
               <p className="mt-1 text-sm text-slate-400">
-                Comparez achat et location de residence principale selon votre apport, votre credit, les frais d'acquisition, les charges et votre horizon de detention.
+                Comparez achat et location de résidence principale selon votre apport, votre crédit, les frais d’acquisition, les charges et votre horizon de détention.
               </p>
             </div>
             <div className="grid gap-2 sm:grid-cols-3">
@@ -865,52 +865,9 @@ function App() {
           </header>
 
           <div className="space-y-4 p-4">
-            <section
-              aria-labelledby="simulateur-intro-title"
-              className="grid gap-4 rounded-2xl border border-slate-800 bg-slate-925/60 p-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)]"
-            >
-              <div>
-                <h2 id="simulateur-intro-title" className="text-lg font-semibold text-slate-50">
-                  Simulateur achat vs location pour residence principale
-                </h2>
-                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
-                  Ce simulateur immobilier aide a estimer le cout net reel d'un achat face a une
-                  location. Il integre le credit immobilier, l'apport, les frais de notaire et
-                  d'agence, la taxe fonciere, l'entretien, l'inflation des loyers et le rendement
-                  alternatif du capital.
-                </p>
-              </div>
-              <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-1">
-                <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
-                  <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
-                    Inclut
-                  </div>
-                  <p className="mt-2 text-sm text-slate-300">
-                    Credit, frais d'achat, taxe fonciere, entretien et charges.
-                  </p>
-                </div>
-                <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
-                  <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
-                    Compare
-                  </div>
-                  <p className="mt-2 text-sm text-slate-300">
-                    Cout net proprietaire, cout net locataire et avantage relatif.
-                  </p>
-                </div>
-                <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
-                  <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
-                    Projette
-                  </div>
-                  <p className="mt-2 text-sm text-slate-300">
-                    L'evolution sur 25 ans pour trouver le point de bascule.
-                  </p>
-                </div>
-              </div>
-            </section>
-
             <SectionCard
-              eyebrow="Parametres"
-              title="Hypotheses de calcul"
+              eyebrow="Paramètres"
+              title="Hypothèses de calcul"
               aside={
                 <div className="flex flex-wrap gap-2">
                   <div className="inline-flex rounded-lg border border-slate-700 bg-slate-950 p-1">
@@ -934,7 +891,7 @@ function App() {
                           : 'text-slate-300 hover:bg-slate-900'
                       }`}
                     >
-                      Prix au m2
+                      Prix au m²
                     </button>
                   </div>
                   <button
@@ -949,7 +906,7 @@ function App() {
                     onClick={() => setInputs(normalizeInputs(DEFAULT_INPUTS))}
                     className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm font-medium text-slate-200 transition hover:bg-slate-900"
                   >
-                    Reinitialiser
+                    Réinitialiser
                   </button>
                 </div>
               }
@@ -968,7 +925,7 @@ function App() {
             </SectionCard>
 
             <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
-              <main className="space-y-4" aria-label="Resultats du simulateur">
+              <main className="space-y-4" aria-label="Résultats du simulateur">
                 <section className="grid gap-3 lg:grid-cols-4">
                   <KeyFigure
                     label="Verdict"
@@ -981,18 +938,18 @@ function App() {
                     tone={buyWins ? 'green' : 'red'}
                   />
                   <KeyFigure
-                    label="Cout net achat"
+                    label="Coût net achat"
                     value={formatCurrency(scenario.ownerNetCost)}
-                    helper={`Bien valorise ${formatCurrency(scenario.propertyValue)}`}
+                    helper={`Bien valorisé : ${formatCurrency(scenario.propertyValue)}`}
                     tone="cyan"
                   />
                   <KeyFigure
-                    label="Cout net location"
+                    label="Coût net location"
                     value={formatCurrency(scenario.rentNetCost)}
-                    helper={`Gain sur capital place ${formatCurrency(scenario.renterInvestmentGain)}`}
+                    helper={`Gain sur capital placé : ${formatCurrency(scenario.renterInvestmentGain)}`}
                   />
                   <KeyFigure
-                    label="Mensualite credit"
+                    label="Mensualité du crédit"
                     value={formatCurrency(scenario.monthlyLoanPayment)}
                     helper={`CRD ${formatCurrency(scenario.remainingBalance)}`}
                   />
@@ -1001,10 +958,10 @@ function App() {
               <section className="grid gap-4 2xl:grid-cols-2">
                 <SectionCard
                   eyebrow="Achat"
-                  title="Structure du cout"
+                  title="Structure du coût"
                   aside={
                     <div className="rounded-md border border-emerald-900/70 bg-emerald-950/30 px-2.5 py-1 text-xs text-emerald-300">
-                      Patrimoine final {formatCurrency(scenario.propertyValue)}
+                      Patrimoine final : {formatCurrency(scenario.propertyValue)}
                     </div>
                   }
                 >
@@ -1016,12 +973,12 @@ function App() {
                         tooltip={purchaseTooltips.purchasePrice}
                       />
                       <BreakdownRow
-                        label="Frais acquisition"
+                        label="Frais d’acquisition"
                         value={scenario.acquisitionFees}
                         tooltip={purchaseTooltips.acquisitionFees}
                       />
                       <BreakdownRow
-                        label="Interets payes"
+                        label="Intérêts payés"
                         value={scenario.interestPaid}
                         tooltip={purchaseTooltips.interestPaid}
                       />
@@ -1031,37 +988,37 @@ function App() {
                         tooltip={purchaseTooltips.ownerChargesTotal}
                       />
                       <BreakdownRow
-                        label="Cout d'opportunite apport"
+                        label="Coût d’opportunité de l’apport"
                         value={scenario.investedCapitalGain}
                         tooltip={purchaseTooltips.investedCapitalGain}
                       />
                       <BreakdownRow
-                        label="Capital restant du"
+                        label="Capital restant dû"
                         value={scenario.remainingBalance}
                         tooltip={purchaseTooltips.remainingBalance}
                       />
                       <BreakdownRow
-                        label="Cout net achat"
+                        label="Coût net achat"
                         value={scenario.ownerNetCost}
                         tooltip={purchaseTooltips.ownerNetCost}
                         emphasize
                       />
                     </div>
                     <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
-                      <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">Resume</div>
+                      <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">Résumé</div>
                       <div className="mt-3 space-y-3">
                         <SummaryMetric
-                          label="Apport mobilise"
+                          label="Apport mobilisé"
                           value={formatCurrency(Math.min(inputs.downPayment, scenario.totalAcquisitionCost))}
                           tooltip={purchaseTooltips.downPayment}
                         />
                         <SummaryMetric
-                          label="Montant emprunte"
+                          label="Montant emprunté"
                           value={formatCurrency(scenario.loanPrincipal)}
                           tooltip={purchaseTooltips.loanPrincipal}
                         />
                         <SummaryMetric
-                          label="Principal rembourse"
+                          label="Principal remboursé"
                           value={formatCurrency(scenario.principalPaid)}
                           tooltip={purchaseTooltips.principalPaid}
                         />
@@ -1072,7 +1029,7 @@ function App() {
 
                 <SectionCard
                   eyebrow="Location"
-                  title="Structure du cout"
+                  title="Structure du coût"
                   aside={
                     <div className="rounded-md border border-cyan-900/70 bg-cyan-950/30 px-2.5 py-1 text-xs text-cyan-300">
                       Loyer initial {formatCurrency(scenario.monthlyRent)}
@@ -1082,7 +1039,7 @@ function App() {
                   <div className="grid gap-4 xl:grid-cols-[1fr_220px]">
                     <div>
                       <BreakdownRow
-                        label="Loyers verses"
+                        label="Loyers versés"
                         value={scenario.totalRentPaid}
                         tooltip={rentalTooltips.totalRentPaid}
                       />
@@ -1098,22 +1055,22 @@ function App() {
                         positive
                       />
                       <BreakdownRow
-                        label="Cout net location"
+                        label="Coût net location"
                         value={scenario.rentNetCost}
                         tooltip={rentalTooltips.rentNetCost}
                         emphasize
                       />
                     </div>
                     <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
-                      <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">Resume</div>
+                      <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">Résumé</div>
                       <div className="mt-3 space-y-3">
                         <SummaryMetric
-                          label="Capital place"
+                          label="Capital placé"
                           value={formatCurrency(scenario.renterInvestedCapital)}
                           tooltip={rentalTooltips.renterInvestedCapital}
                         />
                         <SummaryMetric
-                          label="Rendement cumule"
+                          label="Rendement cumulé"
                           value={formatCurrency(scenario.renterInvestmentGain)}
                           tooltip={rentalTooltips.renterInvestmentGain}
                           valueClassName="text-emerald-300"
@@ -1131,10 +1088,10 @@ function App() {
 
               <SectionCard
                 eyebrow="Comparatif"
-                title="Brouillon courant et scenarios sauvegardes"
+                title="Brouillon courant et scénarios sauvegardés"
                 aside={
                   <div className="rounded-md border border-slate-800 bg-slate-950 px-2.5 py-1 text-xs text-slate-400">
-                    max 4 colonnes
+                    Max. 4 colonnes
                   </div>
                 }
               >
@@ -1142,10 +1099,10 @@ function App() {
                   <table className="min-w-full text-sm">
                     <thead>
                       <tr className="border-b border-slate-800 text-left text-[11px] uppercase tracking-[0.14em] text-slate-500">
-                        <th className="px-3 py-2">Scenario</th>
+                        <th className="px-3 py-2">Scénario</th>
                         <th className="px-3 py-2">Achat net</th>
                         <th className="px-3 py-2">Location nette</th>
-                        <th className="px-3 py-2">Ecart</th>
+                        <th className="px-3 py-2">Écart</th>
                         <th className="px-3 py-2">Verdict</th>
                       </tr>
                     </thead>
@@ -1172,11 +1129,11 @@ function App() {
 
               <section className="grid gap-4">
                 <SectionCard
-                  eyebrow="Evolution"
-                  title="Courbes de cout net dans le temps"
+                  eyebrow="Évolution"
+                  title="Courbes de coût net dans le temps"
                   aside={
                     <div className="rounded-md border border-slate-800 bg-slate-950 px-2.5 py-1 text-xs text-slate-400">
-                      1 a {TIMELINE_YEARS} ans
+                      De 1 à {TIMELINE_YEARS} ans
                     </div>
                   }
                 >
@@ -1191,8 +1148,8 @@ function App() {
 
               <aside>
                 <SectionCard
-                  eyebrow="Scenarios"
-                  title="Bibliotheque"
+                  eyebrow="Scénarios"
+                  title="Bibliothèque"
                   aside={
                     <div className="rounded-md border border-slate-800 bg-slate-950 px-2.5 py-1 text-xs text-slate-400">
                       {savedScenarios.length}
@@ -1202,7 +1159,7 @@ function App() {
                   <div className="space-y-2">
                     {savedScenarios.length === 0 ? (
                       <div className="rounded-lg border border-dashed border-slate-800 px-3 py-4 text-sm text-slate-500">
-                        Aucun scenario sauvegarde.
+                        Aucun scénario sauvegardé.
                       </div>
                     ) : null}
 
@@ -1216,7 +1173,7 @@ function App() {
                               <div className="truncate text-sm font-medium text-slate-100">{entry.name}</div>
                               <div className="mt-1 text-xs text-slate-500">
                                 {entry.inputs.pricingMode === PRICING_MODES.sqm
-                                  ? `${formatCurrency(entry.inputs.purchasePricePerSqm)}/m2 · ${formatCurrency(entry.inputs.monthlyRentPerSqm)}/m2`
+                                  ? `${formatCurrency(entry.inputs.purchasePricePerSqm)}/m² · ${formatCurrency(entry.inputs.monthlyRentPerSqm)}/m²`
                                   : `${formatCurrency(entry.inputs.purchasePrice)} · ${formatCurrency(entry.inputs.monthlyRent)}/mois`}
                               </div>
                             </div>
@@ -1246,7 +1203,7 @@ function App() {
                                   : 'border border-slate-700 text-slate-300 hover:bg-slate-900'
                               }`}
                             >
-                              {isSelected ? 'Compare' : 'Ajouter'}
+                              {isSelected ? 'Comparé' : 'Ajouter'}
                             </button>
                           </div>
                         </article>

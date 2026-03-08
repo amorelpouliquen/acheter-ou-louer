@@ -1,7 +1,7 @@
 {
-  "name": "simulateur-achat",
-  "private": true,
+  "name": "acheter-ou-louer",
   "version": "0.0.0",
+  "description": "Simulateur immobilier pour comparer l'achat et la location d'une residence principale.",
   "type": "module",
   "scripts": {
     "dev": "vite",
