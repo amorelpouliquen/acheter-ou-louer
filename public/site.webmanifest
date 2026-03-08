@@ -1,0 +1,18 @@
+{
+  "name": "Louer ou acheter - Simulateur",
+  "short_name": "Louer ou acheter",
+  "description": "Simulateur immobilier pour comparer le cout reel entre louer et acheter sa residence principale.",
+  "lang": "fr-FR",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#0b1120",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

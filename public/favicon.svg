@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title>Louer ou acheter - Simulateur</title>
+  <rect width="64" height="64" rx="16" fill="#0f172a" />
+  <path
+    d="M13 29.5 32 14l19 15.5"
+    fill="none"
+    stroke="#f8fafc"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="5"
+  />
+  <rect x="18" y="30" width="11" height="16" rx="3" fill="#22d3ee" />
+  <rect x="35" y="26" width="11" height="20" rx="3" fill="#34d399" />
+  <path
+    d="M15 49h34"
+    fill="none"
+    stroke="#f8fafc"
+    stroke-linecap="round"
+    stroke-width="4"
+  />
+</svg>

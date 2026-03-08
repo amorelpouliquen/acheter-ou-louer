@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Louer ou acheter - Simulateur</title>
+  <desc id="desc">Visuel social du simulateur achat vs location immobiliere.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#020617" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#111827" stop-opacity="0.96" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.82" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <circle cx="1030" cy="80" r="170" fill="#22d3ee" fill-opacity="0.12" />
+  <circle cx="130" cy="560" r="200" fill="#34d399" fill-opacity="0.1" />
+
+  <rect x="72" y="72" width="1056" height="486" rx="34" fill="url(#card)" stroke="#1e293b" />
+
+  <g transform="translate(120 150)">
+    <rect width="150" height="150" rx="34" fill="#0f172a" stroke="#1e293b" />
+    <path
+      d="M28 74 75 36l47 38"
+      fill="none"
+      stroke="#f8fafc"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="12"
+    />
+    <rect x="42" y="76" width="28" height="44" rx="8" fill="#22d3ee" />
+    <rect x="84" y="64" width="28" height="56" rx="8" fill="#34d399" />
+    <path d="M34 130h82" fill="none" stroke="#f8fafc" stroke-linecap="round" stroke-width="10" />
+  </g>
+
+  <g transform="translate(330 145)">
+    <text
+      x="0"
+      y="0"
+      fill="#22d3ee"
+      font-family="Manrope, Arial, sans-serif"
+      font-size="26"
+      font-weight="700"
+      letter-spacing="6"
+    >
+      COMPARATEUR IMMOBILIER
+    </text>
+    <text
+      x="0"
+      y="96"
+      fill="#f8fafc"
+      font-family="Manrope, Arial, sans-serif"
+      font-size="64"
+      font-weight="800"
+    >
+      Louer ou acheter
+    </text>
+    <text
+      x="0"
+      y="160"
+      fill="#cbd5e1"
+      font-family="Manrope, Arial, sans-serif"
+      font-size="34"
+      font-weight="500"
+    >
+      Simulateur achat vs location
+    </text>
+    <text
+      x="0"
+      y="240"
+      fill="#94a3b8"
+      font-family="Manrope, Arial, sans-serif"
+      font-size="26"
+      font-weight="500"
+    >
+      Credit, apport, frais, charges, horizon et rendement alternatif
+    </text>
+  </g>
+
+  <g transform="translate(334 420)">
+    <rect width="196" height="92" rx="20" fill="#082f49" stroke="#155e75" />
+    <text
+      x="24"
+      y="36"
+      fill="#67e8f9"
+      font-family="Manrope, Arial, sans-serif"
+      font-size="16"
+      font-weight="700"
+      letter-spacing="2"
+    >
+      ACHAT
+    </text>
+    <text
+      x="24"
+      y="69"
+      fill="#f8fafc"
+      font-family="Manrope, Arial, sans-serif"
+      font-size="28"
+      font-weight="800"
+    >
+      Cout net reel
+    </text>
+  </g>
+
+  <g transform="translate(554 420)">
+    <rect width="196" height="92" rx="20" fill="#3f0d1d" stroke="#9f1239" />
+    <text
+      x="24"
+      y="36"
+      fill="#fda4af"
+      font-family="Manrope, Arial, sans-serif"
+      font-size="16"
+      font-weight="700"
+      letter-spacing="2"
+    >
+      LOCATION
+    </text>
+    <text
+      x="24"
+      y="69"
+      fill="#f8fafc"
+      font-family="Manrope, Arial, sans-serif"
+      font-size="28"
+      font-weight="800"
+    >
+      Comparatif clair
+    </text>
+  </g>
+
+  <g transform="translate(774 420)">
+    <rect width="236" height="92" rx="20" fill="#052e2b" stroke="#065f46" />
+    <text
+      x="24"
+      y="36"
+      fill="#6ee7b7"
+      font-family="Manrope, Arial, sans-serif"
+      font-size="16"
+      font-weight="700"
+      letter-spacing="2"
+    >
+      PROJECTION
+    </text>
+    <text
+      x="24"
+      y="69"
+      fill="#f8fafc"
+      font-family="Manrope, Arial, sans-serif"
+      font-size="28"
+      font-weight="800"
+    >
+      Jusqu'a 25 ans
+    </text>
+  </g>
+</svg>
