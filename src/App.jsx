@@ -565,6 +565,11 @@ function computeTimeline(inputs) {
   return { points, crossoverYear }
 }
 
+function computeSensitivityTimeline(inputs, delta) {
+  const adjustedReturn = Math.max((Number(inputs.opportunityReturn) || 0) + delta, 0)
+  return computeTimeline({ ...inputs, opportunityReturn: adjustedReturn })
+}
+
 function StickySummaryBar({ buyWins, scenario, inputs, formatCurrency, activeSection, onJump }) {
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-800 bg-[#020617]/95 px-3 py-3 backdrop-blur md:hidden">
@@ -720,6 +725,13 @@ function SimulatorPage({
 
   const scenario = useMemo(() => computeScenario(inputs), [inputs])
   const timeline = useMemo(() => computeTimeline(inputs), [inputs])
+  const sensitivityTimeline = useMemo(
+    () => ({
+      plus: computeSensitivityTimeline(inputs, 1),
+      minus: computeSensitivityTimeline(inputs, -1),
+    }),
+    [inputs],
+  )
 
   const comparisonScenarios = useMemo(() => {
     const selected = savedScenarios.filter((item) => selectedIds.includes(item.id))
@@ -870,6 +882,7 @@ function SimulatorPage({
                   purchaseTooltips={purchaseTooltips}
                   rentalTooltips={rentalTooltips}
                   timeline={timeline}
+                  sensitivityTimeline={sensitivityTimeline}
                   formatCurrency={formatCurrency}
                   isMobile={isMobileViewport}
                 />

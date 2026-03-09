@@ -129,15 +129,16 @@ export default function ScenarioForm({
   formatCurrency,
   isMobile,
 }) {
-  const essentialFields = [
+  const essentialFieldIds = [
     FORM_GROUPS.essentials[0],
     FORM_GROUPS.essentials[1],
-    ...(inputs.pricingMode === pricingModes.total
-      ? ['purchasePrice', 'monthlyRent']
-      : ['purchasePricePerSqm', 'monthlyRentPerSqm']),
     FORM_GROUPS.essentials[2],
-    ...FORM_GROUPS.essentialsCharges,
-  ].map((id) => fieldMeta[id])
+    ...(inputs.pricingMode === pricingModes.total
+      ? ['purchasePrice', 'ownerMonthlyCharges', 'monthlyRent', 'renterMonthlyCharges']
+      : ['purchasePricePerSqm', 'ownerMonthlyCharges', 'monthlyRentPerSqm', 'renterMonthlyCharges']),
+  ]
+
+  const essentialFields = essentialFieldIds.map((id) => fieldMeta[id])
 
   const financingFields = FORM_GROUPS.financing.map((id) => fieldMeta[id])
   const advancedFields = FORM_GROUPS.advanced.map((id) => fieldMeta[id])
@@ -190,7 +191,7 @@ export default function ScenarioForm({
                     ? 'xl:col-span-6'
                     : index === 1
                       ? 'xl:col-span-3'
-                      : index === 4
+                      : index === 2
                         ? 'xl:col-span-3'
                         : 'xl:col-span-6'
 

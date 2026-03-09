@@ -78,12 +78,17 @@ function buildLinePath(data, width, height, paddingX, paddingY, accessor, maxVal
     .join(' ')
 }
 
-function TimelineChart({ points, crossoverYear, isMobile }) {
+function TimelineChart({ points, crossoverYear, sensitivityTimeline, opportunityReturn, isMobile }) {
   const width = isMobile ? 320 : 760
   const height = isMobile ? 176 : 240
   const paddingX = isMobile ? 16 : 18
   const paddingY = isMobile ? 18 : 18
-  const maxValue = Math.max(...points.flatMap((point) => [point.ownerNetCost, point.rentNetCost]), 1)
+  const maxValue = Math.max(
+    ...points.flatMap((point) => [point.ownerNetCost, point.rentNetCost]),
+    ...(sensitivityTimeline?.plus?.points ?? []).map((point) => point.rentNetCost),
+    ...(sensitivityTimeline?.minus?.points ?? []).map((point) => point.rentNetCost),
+    1,
+  )
 
   const ownerPath = buildLinePath(
     points,
@@ -103,6 +108,28 @@ function TimelineChart({ points, crossoverYear, isMobile }) {
     (point) => point.rentNetCost,
     maxValue,
   )
+  const rentPlusPath = sensitivityTimeline
+    ? buildLinePath(
+        sensitivityTimeline.plus.points,
+        width,
+        height,
+        paddingX,
+        paddingY,
+        (point) => point.rentNetCost,
+        maxValue,
+      )
+    : ''
+  const rentMinusPath = sensitivityTimeline
+    ? buildLinePath(
+        sensitivityTimeline.minus.points,
+        width,
+        height,
+        paddingX,
+        paddingY,
+        (point) => point.rentNetCost,
+        maxValue,
+      )
+    : ''
   const crossoverPoint = crossoverYear ? points.find((point) => point.year === crossoverYear) : null
   const crossoverX = crossoverPoint
     ? paddingX + ((crossoverPoint.year - 1) / Math.max(points.length - 1, 1)) * (width - paddingX * 2)
@@ -125,8 +152,18 @@ function TimelineChart({ points, crossoverYear, isMobile }) {
           <span className="inline-block h-2.5 w-2.5 rounded-full bg-rose-400" />
           Location nette
         </div>
+        <div className="flex items-center gap-2">
+          <span className="inline-block h-2.5 w-2.5 rounded-full border border-rose-300" />
+          Rendement alternatif +1 %
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="inline-block h-2.5 w-2.5 rounded-full border border-amber-300" />
+          Rendement alternatif -1 %
+        </div>
         <div className="sm:ml-auto text-slate-500">
-          {crossoverYear ? `Croisement estimé vers ${crossoverYear} ans` : 'Pas de croisement sur 25 ans'}
+          {crossoverYear
+            ? `Croisement estimé vers ${crossoverYear} ans • base ${opportunityReturn} %`
+            : `Pas de croisement sur 25 ans • base ${opportunityReturn} %`}
         </div>
       </div>
 
@@ -149,6 +186,24 @@ function TimelineChart({ points, crossoverYear, isMobile }) {
 
           <path d={ownerPath} fill="none" stroke="#22d3ee" strokeWidth={isMobile ? '2.5' : '3'} />
           <path d={rentPath} fill="none" stroke="#fb7185" strokeWidth={isMobile ? '2.5' : '3'} />
+          {rentPlusPath ? (
+            <path
+              d={rentPlusPath}
+              fill="none"
+              stroke="#fda4af"
+              strokeWidth={isMobile ? '2' : '2.5'}
+              strokeDasharray="6 6"
+            />
+          ) : null}
+          {rentMinusPath ? (
+            <path
+              d={rentMinusPath}
+              fill="none"
+              stroke="#fcd34d"
+              strokeWidth={isMobile ? '2' : '2.5'}
+              strokeDasharray="6 6"
+            />
+          ) : null}
 
           {(!isMobile ? points : visibleLabels).map((point, index) => {
             const pointIndex = points.findIndex((entry) => entry.year === point.year)
@@ -221,6 +276,7 @@ export default function ResultsSummary({
   purchaseTooltips,
   rentalTooltips,
   timeline,
+  sensitivityTimeline,
   formatCurrency,
   isMobile,
 }) {
@@ -380,7 +436,13 @@ export default function ResultsSummary({
           </div>
         }
       >
-        <TimelineChart points={timeline.points} crossoverYear={timeline.crossoverYear} isMobile={isMobile} />
+        <TimelineChart
+          points={timeline.points}
+          crossoverYear={timeline.crossoverYear}
+          sensitivityTimeline={sensitivityTimeline}
+          opportunityReturn={inputs.opportunityReturn}
+          isMobile={isMobile}
+        />
       </SectionCard>
     </div>
   )
