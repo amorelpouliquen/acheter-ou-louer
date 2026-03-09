@@ -69,8 +69,9 @@ function SummaryMetric({ label, value, helper, valueClassName = 'text-white' }) 
 }
 
 function toChartY(value, minValue, maxValue, height, paddingY) {
+  const clampedValue = Math.min(Math.max(value, minValue), maxValue)
   const range = Math.max(maxValue - minValue, 1)
-  return paddingY + ((maxValue - value) / range) * (height - paddingY * 2)
+  return paddingY + ((maxValue - clampedValue) / range) * (height - paddingY * 2)
 }
 
 function buildLinePath(data, width, height, paddingX, paddingY, accessor, minValue, maxValue) {
@@ -96,16 +97,16 @@ function TimelineChart({ points, crossoverYear, sensitivityTimeline, opportunity
   const transformValue = chartMode === 'gain' ? (value) => -value : (value) => value
   const ownerLabel = chartMode === 'gain' ? 'Gain net achat' : 'Achat net'
   const rentLabel = chartMode === 'gain' ? 'Gain net location' : 'Location nette'
-  const chartValues = [
-    ...points.flatMap((point) => [
-      transformValue(point.ownerNetCost),
-      transformValue(point.rentNetCost),
-    ]),
-    ...(sensitivityTimeline?.plus?.points ?? []).map((point) => transformValue(point.rentNetCost)),
-    ...(sensitivityTimeline?.minus?.points ?? []).map((point) => transformValue(point.rentNetCost)),
-  ]
-  const minValue = Math.min(...chartValues, 0)
-  const maxValue = Math.max(...chartValues, 0)
+  const primaryValues = points.flatMap((point) => [
+    transformValue(point.ownerNetCost),
+    transformValue(point.rentNetCost),
+  ])
+  const rawMinValue = Math.min(...primaryValues)
+  const rawMaxValue = Math.max(...primaryValues)
+  const rawRange = Math.max(rawMaxValue - rawMinValue, 1)
+  const chartPadding = rawRange * 0.08
+  const minValue = rawMinValue - chartPadding
+  const maxValue = rawMaxValue + chartPadding
 
   const ownerPath = buildLinePath(
     points,
