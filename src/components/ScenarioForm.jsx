@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 const FORM_GROUPS = {
   essentials: ['scenarioName', 'surfaceSqm', 'horizonYears'],
@@ -34,6 +34,38 @@ function formatDisplayNumber(value, decimals = 0) {
   }).format(Number(value))
 }
 
+function formatNumericInput(rawValue, decimalsAllowed) {
+  if (rawValue === null || rawValue === undefined) {
+    return ''
+  }
+
+  const normalized = String(rawValue)
+    .replace(/\s/g, '')
+    .replace(/\u202f/g, '')
+    .replace(',', '.')
+    .replace(/[^\d.]/g, '')
+
+  if (normalized === '') {
+    return ''
+  }
+
+  if (!decimalsAllowed) {
+    return formatDisplayNumber(Number(normalized.replace(/\./g, '')), 0)
+  }
+
+  const [integerPartRaw = '', ...rest] = normalized.split('.')
+  const fractionalRaw = rest.join('')
+  const hasTrailingDecimal = normalized.endsWith('.')
+  const integerPart = integerPartRaw === '' ? 0 : Number(integerPartRaw)
+  const formattedInteger = Number.isFinite(integerPart) ? formatDisplayNumber(integerPart, 0) : ''
+
+  if (fractionalRaw || hasTrailingDecimal) {
+    return `${formattedInteger},${fractionalRaw}`
+  }
+
+  return formattedInteger
+}
+
 function parseInputNumber(rawValue) {
   if (rawValue.trim() === '') {
     return null
@@ -54,35 +86,29 @@ function Field({ field, value, onChange }) {
           step: field.step,
         }
       : {}
-  const [inputValue, setInputValue] = useState(() => formatInputValue(value))
-  const [isEditing, setIsEditing] = useState(false)
+  const [draftValue, setDraftValue] = useState(null)
   const displayValue =
     field.type === 'number'
-      ? isEditing
-        ? inputValue
-        : formatDisplayNumber(value, field.decimals ? 1 : 0)
-      : value
-
-  useEffect(() => {
-    setInputValue(formatInputValue(value))
-  }, [value])
+      ? (draftValue ?? formatDisplayNumber(value, field.decimals ? 1 : 0))
+      : formatInputValue(value)
 
   function commitNumericValue(rawValue) {
     const parsed = parseInputNumber(rawValue)
-    const fallbackValue = field.min ?? 0
-    const nextValue = parsed === null ? fallbackValue : Math.max(parsed, field.min ?? parsed)
+    const withMin = Number.isFinite(field.min) && parsed !== null ? Math.max(parsed, field.min) : parsed
+    const nextValue = Number.isFinite(field.max) && withMin !== null ? Math.min(withMin, field.max) : withMin
 
-    setInputValue(formatInputValue(nextValue))
+    setDraftValue(null)
     onChange(field.id, nextValue)
   }
 
   function adjustNumericValue(direction) {
-    const currentValue = parseInputNumber(inputValue)
+    const currentValue = parseInputNumber(draftValue ?? displayValue)
     const fallbackValue = Number.isFinite(Number(value)) ? Number(value) : field.min ?? 0
     const baseValue = currentValue ?? fallbackValue
-    const nextValue = Math.max(baseValue + (field.step ?? 1) * direction, field.min ?? Number.NEGATIVE_INFINITY)
-    setIsEditing(false)
-    setInputValue(formatInputValue(nextValue))
+    const steppedValue = baseValue + (field.step ?? 1) * direction
+    const withMin = Number.isFinite(field.min) ? Math.max(steppedValue, field.min) : steppedValue
+    const nextValue = Number.isFinite(field.max) ? Math.min(withMin, field.max) : withMin
+    setDraftValue(null)
     onChange(field.id, nextValue)
   }
 
@@ -92,22 +118,17 @@ function Field({ field, value, onChange }) {
     <label className="space-y-2">
       <div className="flex items-center justify-between gap-3">
         <span className="text-sm font-medium text-slate-100">{field.label}</span>
-        {field.unit ? <span className="text-xs text-slate-400">{field.unit}</span> : null}
       </div>
       <div className="rounded-lg border border-slate-800 bg-slate-950 px-3 py-2.5 transition focus-within:border-cyan-500 focus-within:ring-2 focus-within:ring-cyan-500/15">
         <div className="flex items-center gap-2">
           <input
             type={field.type === 'number' ? 'text' : field.type}
-            value={field.type === 'number' ? displayValue : value}
-            onFocus={() => {
-              if (field.type === 'number') {
-                setIsEditing(true)
-                setInputValue(formatInputValue(value))
-              }
-            }}
+            value={field.type === 'number' ? displayValue : formatInputValue(value)}
             onChange={(event) => {
               if (field.type === 'number') {
-                setInputValue(event.target.value)
+                const formatted = formatNumericInput(event.target.value, Boolean(field.decimals))
+                setDraftValue(formatted)
+                onChange(field.id, parseInputNumber(formatted))
                 return
               }
 
@@ -116,13 +137,30 @@ function Field({ field, value, onChange }) {
             onBlur={(event) => {
               if (field.type === 'number') {
                 commitNumericValue(event.target.value)
-                setIsEditing(false)
+              }
+            }}
+            onKeyDown={(event) => {
+              if (field.type !== 'number') {
+                return
+              }
+
+              if (event.key === 'ArrowUp') {
+                event.preventDefault()
+                adjustNumericValue(1)
+              }
+
+              if (event.key === 'ArrowDown') {
+                event.preventDefault()
+                adjustNumericValue(-1)
               }
             }}
             placeholder={field.placeholder}
             className="w-full bg-transparent text-base text-slate-100 outline-none placeholder:text-slate-500"
             {...commonProps}
           />
+          {field.unit ? (
+            <span className="shrink-0 whitespace-nowrap text-xs font-medium text-slate-400">{field.unit}</span>
+          ) : null}
           {isStepperField ? (
             <div className="flex shrink-0 items-center gap-1">
               <button
@@ -190,6 +228,15 @@ export default function ScenarioForm({
   formatCurrency,
   isMobile,
 }) {
+  const rateTripletIds = new Set([
+    'mortgageRate',
+    'agencyFeePercent',
+    'notaryFeePercent',
+    'yearlyRentInflation',
+    'yearlyPropertyGrowth',
+    'opportunityReturn',
+  ])
+
   const essentialFieldIds = [
     FORM_GROUPS.essentials[0],
     FORM_GROUPS.essentials[1],
@@ -278,7 +325,7 @@ export default function ScenarioForm({
               <MiniSummary
                 label="Loyer observé"
                 value={formatCurrency(scenario.monthlyRent)}
-                helper={`Horizon ${inputs.horizonYears} ans`}
+                helper={`Horizon ${inputs.horizonYears ?? '—'} ans`}
               />
             </div>
 
@@ -318,7 +365,12 @@ export default function ScenarioForm({
           <div className="space-y-4">
             <div className={desktopFieldGrid}>
               {financingFields.map((field) => (
-                <div key={field.id} className={isMobile ? '' : 'xl:col-span-6'}>
+                <div
+                  key={field.id}
+                  className={
+                    isMobile ? '' : rateTripletIds.has(field.id) ? 'xl:col-span-4' : 'xl:col-span-6'
+                  }
+                >
                   <Field field={field} value={inputs[field.id]} onChange={onInputChange} />
                 </div>
               ))}
@@ -338,7 +390,12 @@ export default function ScenarioForm({
 
             <div className={desktopFieldGrid}>
               {advancedFields.map((field) => (
-                <div key={field.id} className={isMobile ? '' : 'xl:col-span-6'}>
+                <div
+                  key={field.id}
+                  className={
+                    isMobile ? '' : rateTripletIds.has(field.id) ? 'xl:col-span-4' : 'xl:col-span-6'
+                  }
+                >
                   <Field field={field} value={inputs[field.id]} onChange={onInputChange} />
                 </div>
               ))}

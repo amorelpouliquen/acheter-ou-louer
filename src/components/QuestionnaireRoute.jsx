@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 const QUESTION_STEPS = [
   {
@@ -80,10 +80,6 @@ function ProgressDots({ currentIndex, total }) {
   )
 }
 
-function formatInputValue(value) {
-  return value === null || value === undefined ? '' : String(value)
-}
-
 function formatDisplayNumber(value, decimals = 0) {
   if (value === null || value === undefined || value === '') {
     return ''
@@ -93,6 +89,38 @@ function formatDisplayNumber(value, decimals = 0) {
     minimumFractionDigits: 0,
     maximumFractionDigits: decimals,
   }).format(Number(value))
+}
+
+function formatNumericInput(rawValue, decimalsAllowed) {
+  if (rawValue === null || rawValue === undefined) {
+    return ''
+  }
+
+  const normalized = String(rawValue)
+    .replace(/\s/g, '')
+    .replace(/\u202f/g, '')
+    .replace(',', '.')
+    .replace(/[^\d.]/g, '')
+
+  if (normalized === '') {
+    return ''
+  }
+
+  if (!decimalsAllowed) {
+    return formatDisplayNumber(Number(normalized.replace(/\./g, '')), 0)
+  }
+
+  const [integerPartRaw = '', ...rest] = normalized.split('.')
+  const fractionalRaw = rest.join('')
+  const hasTrailingDecimal = normalized.endsWith('.')
+  const integerPart = integerPartRaw === '' ? 0 : Number(integerPartRaw)
+  const formattedInteger = Number.isFinite(integerPart) ? formatDisplayNumber(integerPart, 0) : ''
+
+  if (fractionalRaw || hasTrailingDecimal) {
+    return `${formattedInteger},${fractionalRaw}`
+  }
+
+  return formattedInteger
 }
 
 function parseInputNumber(rawValue) {
@@ -106,29 +134,23 @@ function parseInputNumber(rawValue) {
 }
 
 function NumberField({ label, helper, unit, value, onChange, step = 1, min = 0 }) {
-  const [inputValue, setInputValue] = useState(() => formatInputValue(value))
-  const [isEditing, setIsEditing] = useState(false)
-  const displayValue = isEditing ? inputValue : formatDisplayNumber(value, step < 1 ? 1 : 0)
-
-  useEffect(() => {
-    setInputValue(formatInputValue(value))
-  }, [value])
+  const [draftValue, setDraftValue] = useState(null)
+  const displayValue = draftValue ?? formatDisplayNumber(value, step < 1 ? 1 : 0)
 
   function commitValue(rawValue) {
     const parsed = parseInputNumber(rawValue)
-    const nextValue = parsed === null ? min : Math.max(parsed, min)
+    const nextValue = parsed === null ? null : Math.max(parsed, min)
 
-    setInputValue(formatInputValue(nextValue))
+    setDraftValue(null)
     onChange(nextValue)
   }
 
   function adjustValue(direction) {
-    const currentValue = parseInputNumber(inputValue)
+    const currentValue = parseInputNumber(displayValue)
     const fallbackValue = Number.isFinite(Number(value)) ? Number(value) : min
     const baseValue = currentValue ?? fallbackValue
     const nextValue = Math.max(baseValue + step * direction, min)
-    setIsEditing(false)
-    setInputValue(formatInputValue(nextValue))
+    setDraftValue(null)
     onChange(nextValue)
   }
 
@@ -138,7 +160,6 @@ function NumberField({ label, helper, unit, value, onChange, step = 1, min = 0 }
     <label className="space-y-2">
       <div className="flex items-center justify-between gap-3">
         <span className="text-sm font-medium text-slate-100">{label}</span>
-        {unit ? <span className="text-xs text-slate-400">{unit}</span> : null}
       </div>
       <div className="rounded-3xl border border-white/10 bg-slate-950/70 px-4 py-4 transition focus-within:border-cyan-300/70 focus-within:ring-2 focus-within:ring-cyan-300/15">
         <div className="flex items-center gap-2">
@@ -148,17 +169,30 @@ function NumberField({ label, helper, unit, value, onChange, step = 1, min = 0 }
             min={min}
             step={step}
             value={displayValue}
-            onFocus={() => {
-              setIsEditing(true)
-              setInputValue(formatInputValue(value))
+            onChange={(event) => {
+              const formatted = formatNumericInput(event.target.value, step < 1)
+              setDraftValue(formatted)
+              onChange(parseInputNumber(formatted))
             }}
-            onChange={(event) => setInputValue(event.target.value)}
             onBlur={(event) => {
               commitValue(event.target.value)
-              setIsEditing(false)
+            }}
+            onKeyDown={(event) => {
+              if (event.key === 'ArrowUp') {
+                event.preventDefault()
+                adjustValue(1)
+              }
+
+              if (event.key === 'ArrowDown') {
+                event.preventDefault()
+                adjustValue(-1)
+              }
             }}
             className="w-full bg-transparent text-lg text-white outline-none placeholder:text-slate-500"
           />
+          {unit ? (
+            <span className="shrink-0 whitespace-nowrap text-xs font-medium text-slate-400">{unit}</span>
+          ) : null}
           {showStepper ? (
             <div className="flex shrink-0 items-center gap-1">
               <button

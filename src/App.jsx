@@ -17,27 +17,50 @@ const PRICING_MODES = {
   sqm: 'sqm',
 }
 
-const DEFAULT_INPUTS = {
-  scenarioName: 'Paris 15 - Base',
-  horizonYears: 10,
+const EMPTY_INPUTS = {
+  scenarioName: '',
+  horizonYears: null,
   pricingMode: PRICING_MODES.total,
-  surfaceSqm: 65,
-  purchasePrice: 715000,
-  monthlyRent: 1950,
-  purchasePricePerSqm: 11000,
-  monthlyRentPerSqm: 30,
-  agencyFeePercent: 6,
-  notaryFeePercent: 8,
-  downPayment: 300000,
-  mortgageRate: 3.6,
-  loanDurationYears: 20,
-  ownerMonthlyCharges: 330,
-  renterMonthlyCharges: 330,
-  yearlyPropertyTax: 2600,
-  yearlyMaintenanceBudget: 1200,
-  yearlyRentInflation: 2,
-  yearlyPropertyGrowth: 2,
-  opportunityReturn: 5,
+  surfaceSqm: null,
+  purchasePrice: null,
+  monthlyRent: null,
+  purchasePricePerSqm: null,
+  monthlyRentPerSqm: null,
+  agencyFeePercent: null,
+  notaryFeePercent: null,
+  downPayment: null,
+  mortgageRate: null,
+  loanDurationYears: null,
+  ownerMonthlyCharges: null,
+  renterMonthlyCharges: null,
+  yearlyPropertyTax: null,
+  yearlyMaintenanceBudget: null,
+  yearlyRentInflation: null,
+  yearlyPropertyGrowth: null,
+  opportunityReturn: null,
+}
+
+const CALCULATION_INPUT_DEFAULTS = {
+  scenarioName: 'Nouveau scénario',
+  horizonYears: 1,
+  pricingMode: PRICING_MODES.total,
+  surfaceSqm: 1,
+  purchasePrice: 0,
+  monthlyRent: 0,
+  purchasePricePerSqm: 0,
+  monthlyRentPerSqm: 0,
+  agencyFeePercent: 0,
+  notaryFeePercent: 0,
+  downPayment: 0,
+  mortgageRate: 0,
+  loanDurationYears: 1,
+  ownerMonthlyCharges: 0,
+  renterMonthlyCharges: 0,
+  yearlyPropertyTax: 0,
+  yearlyMaintenanceBudget: 0,
+  yearlyRentInflation: 0,
+  yearlyPropertyGrowth: 0,
+  opportunityReturn: 0,
 }
 
 const FIELD_META = {
@@ -247,9 +270,12 @@ function parseFiniteNumber(value) {
 }
 
 function normalizeInputs(rawInputs = {}) {
-  const merged = { ...DEFAULT_INPUTS, ...rawInputs }
-  const surfaceSqm = Math.max(parseFiniteNumber(merged.surfaceSqm) ?? DEFAULT_INPUTS.surfaceSqm, 1)
+  const merged = { ...EMPTY_INPUTS, ...rawInputs }
   const pricingMode = merged.pricingMode === PRICING_MODES.sqm ? PRICING_MODES.sqm : PRICING_MODES.total
+  const surfaceSqmValue = parseFiniteNumber(merged.surfaceSqm)
+  const surfaceSqm = surfaceSqmValue === null ? null : Math.max(surfaceSqmValue, 1)
+  const horizonYearsValue = parseFiniteNumber(merged.horizonYears)
+  const horizonYears = horizonYearsValue === null ? null : Math.max(horizonYearsValue, 1)
   const purchasePriceValue = parseFiniteNumber(merged.purchasePrice)
   const monthlyRentValue = parseFiniteNumber(merged.monthlyRent)
   const purchasePricePerSqmValue = parseFiniteNumber(merged.purchasePricePerSqm)
@@ -257,38 +283,82 @@ function normalizeInputs(rawInputs = {}) {
 
   const purchasePrice =
     purchasePriceValue ??
-    (purchasePricePerSqmValue !== null ? purchasePricePerSqmValue * surfaceSqm : null) ??
-    DEFAULT_INPUTS.purchasePrice
+    (purchasePricePerSqmValue !== null && surfaceSqm !== null ? purchasePricePerSqmValue * surfaceSqm : null)
   const monthlyRent =
     monthlyRentValue ??
-    (monthlyRentPerSqmValue !== null ? monthlyRentPerSqmValue * surfaceSqm : null) ??
-    DEFAULT_INPUTS.monthlyRent
+    (monthlyRentPerSqmValue !== null && surfaceSqm !== null ? monthlyRentPerSqmValue * surfaceSqm : null)
 
-  const purchasePricePerSqm = purchasePricePerSqmValue ?? purchasePrice / surfaceSqm
-  const monthlyRentPerSqm = monthlyRentPerSqmValue ?? monthlyRent / surfaceSqm
+  const purchasePricePerSqm =
+    purchasePricePerSqmValue ?? (purchasePrice !== null && surfaceSqm !== null ? purchasePrice / surfaceSqm : null)
+  const monthlyRentPerSqm =
+    monthlyRentPerSqmValue ?? (monthlyRent !== null && surfaceSqm !== null ? monthlyRent / surfaceSqm : null)
 
   return {
     ...merged,
+    scenarioName: typeof merged.scenarioName === 'string' ? merged.scenarioName : '',
+    horizonYears,
     pricingMode,
     surfaceSqm,
     purchasePrice,
     monthlyRent,
     purchasePricePerSqm,
     monthlyRentPerSqm,
+    agencyFeePercent: parseFiniteNumber(merged.agencyFeePercent),
+    notaryFeePercent: parseFiniteNumber(merged.notaryFeePercent),
+    downPayment: parseFiniteNumber(merged.downPayment),
+    mortgageRate: parseFiniteNumber(merged.mortgageRate),
+    loanDurationYears: parseFiniteNumber(merged.loanDurationYears),
+    ownerMonthlyCharges: parseFiniteNumber(merged.ownerMonthlyCharges),
+    renterMonthlyCharges: parseFiniteNumber(merged.renterMonthlyCharges),
+    yearlyPropertyTax: parseFiniteNumber(merged.yearlyPropertyTax),
+    yearlyMaintenanceBudget: parseFiniteNumber(merged.yearlyMaintenanceBudget),
+    yearlyRentInflation: parseFiniteNumber(merged.yearlyRentInflation),
+    yearlyPropertyGrowth: parseFiniteNumber(merged.yearlyPropertyGrowth),
+    opportunityReturn: parseFiniteNumber(merged.opportunityReturn),
   }
 }
 
-function resolvePriceInputs(inputs) {
-  if (inputs.pricingMode === PRICING_MODES.sqm) {
-    return {
-      purchasePrice: inputs.surfaceSqm * inputs.purchasePricePerSqm,
-      monthlyRent: inputs.surfaceSqm * inputs.monthlyRentPerSqm,
-    }
-  }
+function resolveCalculationInputs(rawInputs) {
+  const normalizedInputs = normalizeInputs(rawInputs)
+  const surfaceSqm = Math.max(normalizedInputs.surfaceSqm ?? CALCULATION_INPUT_DEFAULTS.surfaceSqm, 1)
+  const horizonYears = Math.max(normalizedInputs.horizonYears ?? CALCULATION_INPUT_DEFAULTS.horizonYears, 1)
+  const loanDurationYears = Math.max(
+    normalizedInputs.loanDurationYears ?? CALCULATION_INPUT_DEFAULTS.loanDurationYears,
+    1,
+  )
+  const purchasePrice =
+    normalizedInputs.purchasePrice ??
+    (normalizedInputs.purchasePricePerSqm ?? CALCULATION_INPUT_DEFAULTS.purchasePricePerSqm) * surfaceSqm
+  const monthlyRent =
+    normalizedInputs.monthlyRent ??
+    (normalizedInputs.monthlyRentPerSqm ?? CALCULATION_INPUT_DEFAULTS.monthlyRentPerSqm) * surfaceSqm
 
   return {
-    purchasePrice: inputs.purchasePrice,
-    monthlyRent: inputs.monthlyRent,
+    ...normalizedInputs,
+    scenarioName: normalizedInputs.scenarioName || CALCULATION_INPUT_DEFAULTS.scenarioName,
+    surfaceSqm,
+    horizonYears,
+    purchasePrice,
+    monthlyRent,
+    purchasePricePerSqm: normalizedInputs.purchasePricePerSqm ?? purchasePrice / surfaceSqm,
+    monthlyRentPerSqm: normalizedInputs.monthlyRentPerSqm ?? monthlyRent / surfaceSqm,
+    agencyFeePercent: normalizedInputs.agencyFeePercent ?? CALCULATION_INPUT_DEFAULTS.agencyFeePercent,
+    notaryFeePercent: normalizedInputs.notaryFeePercent ?? CALCULATION_INPUT_DEFAULTS.notaryFeePercent,
+    downPayment: normalizedInputs.downPayment ?? CALCULATION_INPUT_DEFAULTS.downPayment,
+    mortgageRate: normalizedInputs.mortgageRate ?? CALCULATION_INPUT_DEFAULTS.mortgageRate,
+    loanDurationYears,
+    ownerMonthlyCharges:
+      normalizedInputs.ownerMonthlyCharges ?? CALCULATION_INPUT_DEFAULTS.ownerMonthlyCharges,
+    renterMonthlyCharges:
+      normalizedInputs.renterMonthlyCharges ?? CALCULATION_INPUT_DEFAULTS.renterMonthlyCharges,
+    yearlyPropertyTax: normalizedInputs.yearlyPropertyTax ?? CALCULATION_INPUT_DEFAULTS.yearlyPropertyTax,
+    yearlyMaintenanceBudget:
+      normalizedInputs.yearlyMaintenanceBudget ?? CALCULATION_INPUT_DEFAULTS.yearlyMaintenanceBudget,
+    yearlyRentInflation:
+      normalizedInputs.yearlyRentInflation ?? CALCULATION_INPUT_DEFAULTS.yearlyRentInflation,
+    yearlyPropertyGrowth:
+      normalizedInputs.yearlyPropertyGrowth ?? CALCULATION_INPUT_DEFAULTS.yearlyPropertyGrowth,
+    opportunityReturn: normalizedInputs.opportunityReturn ?? CALCULATION_INPUT_DEFAULTS.opportunityReturn,
   }
 }
 
@@ -461,8 +531,8 @@ function sumGrowingMonthlyPayment(baseMonthly, yearlyGrowth, years) {
 }
 
 function computeScenario(inputs) {
-  const normalizedInputs = normalizeInputs(inputs)
-  const { purchasePrice, monthlyRent } = resolvePriceInputs(normalizedInputs)
+  const normalizedInputs = resolveCalculationInputs(inputs)
+  const { purchasePrice, monthlyRent } = normalizedInputs
   const acquisitionFees =
     purchasePrice * ((normalizedInputs.agencyFeePercent + normalizedInputs.notaryFeePercent) / 100)
   const totalAcquisitionCost = purchasePrice + acquisitionFees
@@ -566,7 +636,10 @@ function computeTimeline(inputs) {
 }
 
 function computeSensitivityTimeline(inputs, delta) {
-  const adjustedReturn = Math.max((Number(inputs.opportunityReturn) || 0) + delta, 0)
+  const adjustedReturn = Math.max(
+    (Number(inputs.opportunityReturn) || CALCULATION_INPUT_DEFAULTS.opportunityReturn) + delta,
+    0,
+  )
   return computeTimeline({ ...inputs, opportunityReturn: adjustedReturn })
 }
 
@@ -578,7 +651,7 @@ function StickySummaryBar({ buyWins, scenario, inputs, formatCurrency, activeSec
           <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
             <span>{buyWins ? 'Acheter' : 'Louer'}</span>
             <span className="h-1 w-1 rounded-full bg-slate-500" />
-            <span>{inputs.horizonYears} ans</span>
+            <span>{inputs.horizonYears ?? '—'} ans</span>
           </div>
           <div className="mt-1 text-sm font-semibold text-slate-100">{formatCurrency(Math.abs(scenario.advantage))}</div>
           <div className="text-xs text-slate-400">Mensualité {formatCurrency(scenario.monthlyLoanPayment)}</div>
@@ -738,7 +811,7 @@ function SimulatorPage({
     return [
       {
         id: 'draft',
-        name: `${inputs.scenarioName} (brouillon)`,
+        name: `${(inputs.scenarioName || 'Scénario sans nom').trim()} (brouillon)`,
         inputs,
         results: scenario,
       },
@@ -750,23 +823,24 @@ function SimulatorPage({
   }, [inputs, savedScenarios, scenario, selectedIds])
 
   const buyWins = scenario.advantage > 0
+  const horizonLabel = inputs.horizonYears ?? '—'
   const purchaseTooltips = {
     purchasePrice:
       "Prix de départ du logement. Ce n'est pas une dépense perdue à 100 % si vous revendez.",
     acquisitionFees:
       "Principalement notaire et agence. C'est une sortie de cash immédiate, généralement non récupérable.",
-    interestPaid: `Part des mensualités versée à la banque sur ${inputs.horizonYears} ans observés.`,
+    interestPaid: `Part des mensualités versée à la banque sur ${horizonLabel} ans observés.`,
     ownerChargesTotal:
       "Charges de copropriété, taxe foncière et entretien cumulés sur la période choisie.",
-    investedCapitalGain: `Ce que l'apport aurait pu produire à ${formatNumber(inputs.opportunityReturn)} % par an s'il restait investi.`,
+    investedCapitalGain: `Ce que l'apport aurait pu produire à ${formatNumber(inputs.opportunityReturn ?? 0)} % par an s'il restait investi.`,
     remainingBalance:
       "Somme restant à rembourser à la banque à la fin de la période observée.",
-    ownerNetCost: `Coût net achat sur ${inputs.horizonYears} ans après prise en compte du patrimoine récupéré, estimé ici à ${formatCurrency(scenario.equityRecovered)}.`,
+    ownerNetCost: `Coût net achat sur ${horizonLabel} ans après prise en compte du patrimoine récupéré, estimé ici à ${formatCurrency(scenario.equityRecovered)}.`,
   }
   const rentalTooltips = {
-    totalRentPaid: `Total des loyers versés sur ${inputs.horizonYears} ans avec inflation des loyers.`,
+    totalRentPaid: `Total des loyers versés sur ${horizonLabel} ans avec inflation des loyers.`,
     renterChargesTotal: 'Total des charges supportées en tant que locataire sur la période.',
-    renterInvestmentGain: `Gain cumulé du capital laissé placé à ${formatNumber(inputs.opportunityReturn)} % par an.`,
+    renterInvestmentGain: `Gain cumulé du capital laissé placé à ${formatNumber(inputs.opportunityReturn ?? 0)} % par an.`,
     rentNetCost: "Loyers et charges, moins le rendement du capital que vous n'avez pas immobilisé dans l'achat.",
   }
 
@@ -865,7 +939,7 @@ function SimulatorPage({
                   onInputChange={updateInput}
                   onPricingModeChange={updatePricingMode}
                   onSave={saveScenario}
-                  onReset={() => setInputs(normalizeInputs(DEFAULT_INPUTS))}
+                  onReset={() => setInputs(normalizeInputs())}
                   onShowResults={() => jumpToSection('results')}
                   formatCurrency={formatCurrency}
                   isMobile={isMobileViewport}
@@ -934,7 +1008,7 @@ function SimulatorPage({
 
 function App() {
   const [route, setRoute] = useState(() => syncLegacyRoute())
-  const [inputs, setInputs] = useState(() => normalizeInputs(DEFAULT_INPUTS))
+  const [inputs, setInputs] = useState(() => normalizeInputs())
 
   useEffect(() => {
     const syncRoute = () => {
