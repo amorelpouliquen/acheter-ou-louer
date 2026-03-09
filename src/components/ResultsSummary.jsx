@@ -1,6 +1,12 @@
-function SectionCard({ eyebrow, title, aside, children }) {
+function SectionCard({ eyebrow, title, aside, children, tone = 'slate' }) {
+  const tones = {
+    slate: 'border-slate-800 bg-slate-925/80',
+    green: 'border-emerald-800/70 bg-emerald-950/15',
+    red: 'border-rose-800/70 bg-rose-950/15',
+  }
+
   return (
-    <section className="rounded-2xl border border-slate-800 bg-slate-925/80 p-4">
+    <section className={`rounded-2xl border p-4 ${tones[tone]}`}>
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
@@ -293,12 +299,13 @@ export default function ResultsSummary({
           label="Coût net achat"
           value={formatCurrency(scenario.ownerNetCost)}
           helper={`Patrimoine ${formatCurrency(scenario.propertyValue)}`}
-          tone="cyan"
+          tone={buyWins ? 'green' : 'red'}
         />
         <KeyFigure
           label="Coût net location"
           value={formatCurrency(scenario.rentNetCost)}
           helper={`Capital place ${formatCurrency(scenario.renterInvestmentGain)}`}
+          tone={buyWins ? 'red' : 'green'}
         />
         <KeyFigure
           label="Mensualité crédit"
@@ -311,8 +318,15 @@ export default function ResultsSummary({
         <SectionCard
           eyebrow="Achat"
           title="Lecture rapide du coût"
+          tone={buyWins ? 'green' : 'red'}
           aside={
-            <div className="rounded-md border border-emerald-900/70 bg-emerald-950/30 px-2.5 py-1 text-xs text-emerald-300">
+            <div
+              className={`rounded-md border px-2.5 py-1 text-xs ${
+                buyWins
+                  ? 'border-emerald-900/70 bg-emerald-950/30 text-emerald-300'
+                  : 'border-rose-900/70 bg-rose-950/30 text-rose-300'
+              }`}
+            >
               Valeur finale {formatCurrency(scenario.propertyValue)}
             </div>
           }
@@ -378,8 +392,15 @@ export default function ResultsSummary({
         <SectionCard
           eyebrow="Location"
           title="Lecture rapide du coût"
+          tone={buyWins ? 'red' : 'green'}
           aside={
-            <div className="rounded-md border border-cyan-900/70 bg-cyan-950/30 px-2.5 py-1 text-xs text-cyan-300">
+            <div
+              className={`rounded-md border px-2.5 py-1 text-xs ${
+                buyWins
+                  ? 'border-rose-900/70 bg-rose-950/30 text-rose-300'
+                  : 'border-emerald-900/70 bg-emerald-950/30 text-emerald-300'
+              }`}
+            >
               Loyer initial {formatCurrency(scenario.monthlyRent)}
             </div>
           }
