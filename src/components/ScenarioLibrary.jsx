@@ -75,14 +75,14 @@ export default function ScenarioLibrary({
               </div>
 
               <div className="mt-3 rounded-lg border border-slate-800 bg-slate-950/80 p-3">
-                <div className="flex items-center justify-between gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div className="text-xs font-medium text-slate-300">
                     {isLatestShare ? 'Lien unique prêt à partager' : 'Lien de partage'}
                   </div>
                   <button
                     type="button"
                     onClick={() => copyShareUrl(shareUrl)}
-                    className="cta-soft min-h-9 rounded-md px-3 text-xs transition"
+                    className="cta-soft min-h-9 w-full rounded-md px-3 text-xs transition sm:w-auto"
                   >
                     Copier le lien
                   </button>
