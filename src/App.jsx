@@ -518,6 +518,25 @@ function futureValue(capital, yearlyRate, years) {
   return capital * (1 + yearlyRate / 100) ** years
 }
 
+function futureValueOfAnnualContributions(annualContribution, yearlyRate, years) {
+  if (annualContribution <= 0 || years <= 0) {
+    return 0
+  }
+
+  if (yearlyRate <= 0) {
+    return annualContribution * years
+  }
+
+  const rate = yearlyRate / 100
+  let value = 0
+
+  for (let year = 0; year < years; year += 1) {
+    value = value * (1 + rate) + annualContribution
+  }
+
+  return value
+}
+
 function sumGrowingMonthlyPayment(baseMonthly, yearlyGrowth, years) {
   let total = 0
 
@@ -561,7 +580,17 @@ function computeScenario(inputs) {
     ownerChargesTotal +
     amortization.totalInterestPaid +
     investedCapitalGain
-  const ownerNetCost = ownerGrossCost + effectiveDownPayment - equityRecovered
+  const yearsAfterLoan = Math.max(normalizedInputs.horizonYears - normalizedInputs.loanDurationYears, 0)
+  const ownerPostLoanAnnualSavings = amortization.payment * 12
+  const ownerPostLoanInvestmentValue = futureValueOfAnnualContributions(
+    ownerPostLoanAnnualSavings,
+    normalizedInputs.opportunityReturn,
+    yearsAfterLoan,
+  )
+  const ownerPostLoanSavingsPrincipal = ownerPostLoanAnnualSavings * yearsAfterLoan
+  const ownerPostLoanInvestmentGain = ownerPostLoanInvestmentValue - ownerPostLoanSavingsPrincipal
+  const ownerNetCost =
+    ownerGrossCost + effectiveDownPayment - equityRecovered - ownerPostLoanInvestmentGain
 
   const totalRentPaid = sumGrowingMonthlyPayment(
     monthlyRent,
@@ -589,6 +618,10 @@ function computeScenario(inputs) {
     principalPaid: amortization.totalPrincipalPaid,
     ownerChargesTotal,
     investedCapitalGain,
+    ownerPostLoanInvestmentGain,
+    ownerPostLoanInvestmentValue,
+    ownerPostLoanSavingsPrincipal,
+    yearsAfterLoan,
     propertyValue,
     equityRecovered,
     ownerNetCost,
@@ -821,6 +854,7 @@ function SimulatorPage({
     ownerChargesTotal:
       "Charges de copropriété, taxe foncière et entretien cumulés sur la période choisie.",
     investedCapitalGain: `Ce que l'apport aurait pu produire à ${formatNumber(inputs.opportunityReturn ?? 0)} % par an s'il restait investi.`,
+    ownerPostLoanInvestmentGain: `Rendement estimé de l'épargne de la mensualité de crédit après la fin du prêt, placée à ${formatNumber(inputs.opportunityReturn ?? 0)} % par an.`,
     remainingBalance:
       "Somme restant à rembourser à la banque à la fin de la période observée.",
     ownerNetCost: `Coût net achat sur ${horizonLabel} ans après prise en compte du patrimoine récupéré, estimé ici à ${formatCurrency(scenario.equityRecovered)}.`,

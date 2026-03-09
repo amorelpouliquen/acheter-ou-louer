@@ -68,7 +68,12 @@ function SummaryMetric({ label, value, helper, valueClassName = 'text-white' }) 
   )
 }
 
-function buildLinePath(data, width, height, paddingX, paddingY, accessor, maxValue) {
+function toChartY(value, minValue, maxValue, height, paddingY) {
+  const range = Math.max(maxValue - minValue, 1)
+  return paddingY + ((maxValue - value) / range) * (height - paddingY * 2)
+}
+
+function buildLinePath(data, width, height, paddingX, paddingY, accessor, minValue, maxValue) {
   if (data.length === 0) {
     return ''
   }
@@ -76,8 +81,7 @@ function buildLinePath(data, width, height, paddingX, paddingY, accessor, maxVal
   return data
     .map((point, index) => {
       const x = paddingX + (index / Math.max(data.length - 1, 1)) * (width - paddingX * 2)
-      const y =
-        height - paddingY - (accessor(point) / Math.max(maxValue, 1)) * (height - paddingY * 2)
+      const y = toChartY(accessor(point), minValue, maxValue, height, paddingY)
 
       return `${index === 0 ? 'M' : 'L'} ${x} ${y}`
     })
@@ -89,12 +93,14 @@ function TimelineChart({ points, crossoverYear, sensitivityTimeline, opportunity
   const height = isMobile ? 176 : 240
   const paddingX = isMobile ? 16 : 18
   const paddingY = isMobile ? 18 : 18
-  const maxValue = Math.max(
-    ...points.flatMap((point) => [point.ownerNetCost, point.rentNetCost]),
-    ...(sensitivityTimeline?.plus?.points ?? []).map((point) => point.rentNetCost),
-    ...(sensitivityTimeline?.minus?.points ?? []).map((point) => point.rentNetCost),
-    1,
-  )
+  const toNetGain = (cost) => -cost
+  const chartValues = [
+    ...points.flatMap((point) => [toNetGain(point.ownerNetCost), toNetGain(point.rentNetCost)]),
+    ...(sensitivityTimeline?.plus?.points ?? []).map((point) => toNetGain(point.rentNetCost)),
+    ...(sensitivityTimeline?.minus?.points ?? []).map((point) => toNetGain(point.rentNetCost)),
+  ]
+  const minValue = Math.min(...chartValues, 0)
+  const maxValue = Math.max(...chartValues, 0)
 
   const ownerPath = buildLinePath(
     points,
@@ -102,7 +108,8 @@ function TimelineChart({ points, crossoverYear, sensitivityTimeline, opportunity
     height,
     paddingX,
     paddingY,
-    (point) => point.ownerNetCost,
+    (point) => toNetGain(point.ownerNetCost),
+    minValue,
     maxValue,
   )
   const rentPath = buildLinePath(
@@ -111,7 +118,8 @@ function TimelineChart({ points, crossoverYear, sensitivityTimeline, opportunity
     height,
     paddingX,
     paddingY,
-    (point) => point.rentNetCost,
+    (point) => toNetGain(point.rentNetCost),
+    minValue,
     maxValue,
   )
   const rentPlusPath = sensitivityTimeline
@@ -121,7 +129,8 @@ function TimelineChart({ points, crossoverYear, sensitivityTimeline, opportunity
         height,
         paddingX,
         paddingY,
-        (point) => point.rentNetCost,
+        (point) => toNetGain(point.rentNetCost),
+        minValue,
         maxValue,
       )
     : ''
@@ -132,7 +141,8 @@ function TimelineChart({ points, crossoverYear, sensitivityTimeline, opportunity
         height,
         paddingX,
         paddingY,
-        (point) => point.rentNetCost,
+        (point) => toNetGain(point.rentNetCost),
+        minValue,
         maxValue,
       )
     : ''
@@ -141,7 +151,7 @@ function TimelineChart({ points, crossoverYear, sensitivityTimeline, opportunity
     ? paddingX + ((crossoverPoint.year - 1) / Math.max(points.length - 1, 1)) * (width - paddingX * 2)
     : null
   const crossoverY = crossoverPoint
-    ? height - paddingY - (crossoverPoint.ownerNetCost / maxValue) * (height - paddingY * 2)
+    ? toChartY(toNetGain(crossoverPoint.ownerNetCost), minValue, maxValue, height, paddingY)
     : null
   const visibleLabels = isMobile
     ? [points[0], points[Math.floor(points.length / 2)], points[points.length - 1]].filter(Boolean)
@@ -152,11 +162,11 @@ function TimelineChart({ points, crossoverYear, sensitivityTimeline, opportunity
       <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
         <div className="flex items-center gap-2">
           <span className="inline-block h-2.5 w-2.5 rounded-full bg-cyan-400" />
-          Achat net
+          Gain net achat
         </div>
         <div className="flex items-center gap-2">
           <span className="inline-block h-2.5 w-2.5 rounded-full bg-rose-400" />
-          Location nette
+          Gain net location
         </div>
         <div className="flex items-center gap-2">
           <span className="inline-block h-2.5 w-2.5 rounded-full border border-rose-300" />
@@ -176,7 +186,7 @@ function TimelineChart({ points, crossoverYear, sensitivityTimeline, opportunity
       <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
         <svg viewBox={`0 0 ${width} ${height}`} className={`${isMobile ? 'h-44' : 'h-60'} w-full`}>
           {[0.33, 0.66, 1].map((ratio) => {
-            const y = height - paddingY - ratio * (height - paddingY * 2)
+            const y = paddingY + (1 - ratio) * (height - paddingY * 2)
             return (
               <line
                 key={ratio}
@@ -214,9 +224,8 @@ function TimelineChart({ points, crossoverYear, sensitivityTimeline, opportunity
           {(!isMobile ? points : visibleLabels).map((point, index) => {
             const pointIndex = points.findIndex((entry) => entry.year === point.year)
             const x = paddingX + (pointIndex / Math.max(points.length - 1, 1)) * (width - paddingX * 2)
-            const ownerY =
-              height - paddingY - (point.ownerNetCost / maxValue) * (height - paddingY * 2)
-            const rentY = height - paddingY - (point.rentNetCost / maxValue) * (height - paddingY * 2)
+            const ownerY = toChartY(toNetGain(point.ownerNetCost), minValue, maxValue, height, paddingY)
+            const rentY = toChartY(toNetGain(point.rentNetCost), minValue, maxValue, height, paddingY)
 
             return (
               <g key={`${point.year}-${index}`}>
@@ -364,6 +373,13 @@ export default function ResultsSummary({
                 formatCurrency={formatCurrency}
               />
               <DisclosureRow
+                label="Rendement épargne post-crédit"
+                value={scenario.ownerPostLoanInvestmentGain}
+                tooltip={purchaseTooltips.ownerPostLoanInvestmentGain}
+                positive
+                formatCurrency={formatCurrency}
+              />
+              <DisclosureRow
                 label="Capital restant dû"
                 value={scenario.remainingBalance}
                 tooltip={purchaseTooltips.remainingBalance}
@@ -385,6 +401,11 @@ export default function ResultsSummary({
               />
               <SummaryMetric label="Montant emprunté" value={formatCurrency(scenario.loanPrincipal)} />
               <SummaryMetric label="Principal remboursé" value={formatCurrency(scenario.principalPaid)} />
+              <SummaryMetric
+                label="Épargne post-crédit"
+                value={formatCurrency(scenario.ownerPostLoanSavingsPrincipal)}
+                helper={`${scenario.yearsAfterLoan} an(s) placés après le prêt`}
+              />
             </div>
           </div>
         </SectionCard>
@@ -450,7 +471,7 @@ export default function ResultsSummary({
 
       <SectionCard
         eyebrow="Evolution"
-          title="Courbe de coût net"
+        title="Courbe de gain net (plus haut = mieux)"
         aside={
           <div className="rounded-md border border-slate-800 bg-slate-950 px-2.5 py-1 text-xs text-slate-400">
             1 à 25 ans
