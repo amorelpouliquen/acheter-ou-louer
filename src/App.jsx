@@ -11,6 +11,8 @@ const STORAGE_KEY = 'simulateur-achat-scenarios'
 const STORAGE_DB_NAME = 'simulateur-achat-db'
 const STORAGE_STORE_NAME = 'app-state'
 const STORAGE_RECORD_ID = 'saved-scenarios'
+const SHARE_QUERY_PARAM = 'simulation'
+const SHARE_PAYLOAD_VERSION = 1
 const TIMELINE_YEARS = 25
 const PRICING_MODES = {
   total: 'total',
@@ -378,6 +380,76 @@ function readLocalBackup() {
       : []
   } catch {
     return []
+  }
+}
+
+function toBase64Url(value) {
+  const bytes = new TextEncoder().encode(value)
+  let binary = ''
+
+  bytes.forEach((byte) => {
+    binary += String.fromCharCode(byte)
+  })
+
+  return window.btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
+}
+
+function fromBase64Url(value) {
+  const normalized = value.replace(/-/g, '+').replace(/_/g, '/')
+  const padding = '='.repeat((4 - (normalized.length % 4)) % 4)
+  const binary = window.atob(`${normalized}${padding}`)
+  const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0))
+  return new TextDecoder().decode(bytes)
+}
+
+function createSharePayload(entry) {
+  return {
+    v: SHARE_PAYLOAD_VERSION,
+    id: entry.id,
+    name: entry.name,
+    createdAt: entry.createdAt,
+    inputs: normalizeInputs(entry.inputs),
+  }
+}
+
+function buildShareUrl(entry) {
+  if (typeof window === 'undefined') {
+    return ''
+  }
+
+  const url = new URL(window.location.href)
+  url.hash = ''
+  url.searchParams.set(SHARE_QUERY_PARAM, toBase64Url(JSON.stringify(createSharePayload(entry))))
+  return url.toString()
+}
+
+function readSharedScenarioFromUrl() {
+  if (typeof window === 'undefined') {
+    return null
+  }
+
+  try {
+    const url = new URL(window.location.href)
+    const rawPayload = url.searchParams.get(SHARE_QUERY_PARAM)
+
+    if (!rawPayload) {
+      return null
+    }
+
+    const parsed = JSON.parse(fromBase64Url(rawPayload))
+
+    if (!parsed || parsed.v !== SHARE_PAYLOAD_VERSION || typeof parsed !== 'object') {
+      return null
+    }
+
+    return {
+      id: typeof parsed.id === 'string' && parsed.id ? parsed.id : crypto.randomUUID(),
+      name: typeof parsed.name === 'string' && parsed.name ? parsed.name : 'Scénario partagé',
+      createdAt: typeof parsed.createdAt === 'string' ? parsed.createdAt : new Date().toISOString(),
+      inputs: normalizeInputs(parsed.inputs),
+    }
+  } catch {
+    return null
   }
 }
 
@@ -766,10 +838,12 @@ function SimulatorPage({
   formatNumber,
   normalizeInputs,
   onOpenQuestionnaire,
+  sharedScenario,
 }) {
   const [savedScenarios, setSavedScenarios] = useState(() => readLocalBackup())
   const [selectedIds, setSelectedIds] = useState([])
   const [isStorageReady, setIsStorageReady] = useState(false)
+  const [latestShare, setLatestShare] = useState(null)
   const [isMobileViewport, setIsMobileViewport] = useState(() =>
     typeof window !== 'undefined' ? window.innerWidth < 1024 : false,
   )
@@ -784,7 +858,15 @@ function SimulatorPage({
 
     readPersistedScenarios().then((scenarios) => {
       if (active) {
-        setSavedScenarios(scenarios)
+        const mergedScenarios =
+          sharedScenario && !scenarios.some((entry) => entry.id === sharedScenario.id)
+            ? [sharedScenario, ...scenarios]
+            : scenarios
+
+        setSavedScenarios(mergedScenarios)
+        if (sharedScenario) {
+          setSelectedIds((current) => [sharedScenario.id, ...current].slice(0, 3))
+        }
         setIsStorageReady(true)
       }
     })
@@ -792,7 +874,7 @@ function SimulatorPage({
     return () => {
       active = false
     }
-  }, [])
+  }, [sharedScenario])
 
   useEffect(() => {
     if (!isStorageReady) {
@@ -879,10 +961,16 @@ function SimulatorPage({
       createdAt: new Date().toISOString(),
       inputs,
     }
+    const shareUrl = buildShareUrl(entry)
 
     setSavedScenarios((current) => [entry, ...current])
     setSelectedIds((current) => [entry.id, ...current].slice(0, 3))
+    setLatestShare({ id: entry.id, url: shareUrl })
     setActiveSection('library')
+
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(shareUrl).catch(() => undefined)
+    }
   }
 
   function loadScenario(entry) {
@@ -997,6 +1085,8 @@ function SimulatorPage({
                   savedScenarios={savedScenarios}
                   selectedIds={selectedIds}
                   pricingModes={PRICING_MODES}
+                  latestShare={latestShare}
+                  buildShareUrl={buildShareUrl}
                   onDelete={deleteScenario}
                   onLoad={loadScenario}
                   onToggle={toggleComparison}
@@ -1027,6 +1117,7 @@ function SimulatorPage({
 function App() {
   const [route, setRoute] = useState(() => syncLegacyRoute())
   const [inputs, setInputs] = useState(() => normalizeInputs())
+  const [sharedScenario] = useState(() => readSharedScenarioFromUrl())
 
   useEffect(() => {
     const syncRoute = () => {
@@ -1042,6 +1133,15 @@ function App() {
       window.removeEventListener('hashchange', syncRoute)
     }
   }, [])
+
+  useEffect(() => {
+    if (!sharedScenario) {
+      return
+    }
+
+    setInputs(sharedScenario.inputs)
+    setRoute('/')
+  }, [sharedScenario])
 
   function navigate(nextRoute) {
     const target = nextRoute === '/form' ? '#/form' : '#/'
@@ -1076,6 +1176,7 @@ function App() {
       formatNumber={formatNumber}
       normalizeInputs={normalizeInputs}
       onOpenQuestionnaire={() => navigate('/form')}
+      sharedScenario={sharedScenario}
     />
   )
 }

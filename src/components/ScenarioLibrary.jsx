@@ -2,11 +2,25 @@ export default function ScenarioLibrary({
   savedScenarios,
   selectedIds,
   pricingModes,
+  latestShare,
+  buildShareUrl,
   onDelete,
   onLoad,
   onToggle,
   formatCurrency,
 }) {
+  async function copyShareUrl(url) {
+    if (!navigator.clipboard?.writeText) {
+      return
+    }
+
+    try {
+      await navigator.clipboard.writeText(url)
+    } catch {
+      // Ignore clipboard failures and keep the raw link visible.
+    }
+  }
+
   return (
     <section className="rounded-2xl border border-slate-800 bg-slate-925/80 p-4">
       <div className="mb-4 flex items-start justify-between gap-3">
@@ -21,6 +35,13 @@ export default function ScenarioLibrary({
         </div>
       </div>
 
+      {latestShare ? (
+        <div className="mb-4 rounded-xl border border-cyan-800/70 bg-cyan-950/30 p-3">
+          <div className="text-sm font-semibold text-cyan-100">Lien de partage créé</div>
+          <div className="mt-1 break-all text-xs leading-5 text-cyan-200/80">{latestShare.url}</div>
+        </div>
+      ) : null}
+
       <div className="grid gap-3 xl:grid-cols-2 2xl:grid-cols-3">
         {savedScenarios.length === 0 ? (
           <div className="xl:col-span-2 2xl:col-span-3 rounded-lg border border-dashed border-slate-800 bg-slate-950/50 px-4 py-5 text-sm text-slate-500">
@@ -30,6 +51,8 @@ export default function ScenarioLibrary({
 
         {savedScenarios.map((entry) => {
           const isSelected = selectedIds.includes(entry.id)
+          const shareUrl = buildShareUrl(entry)
+          const isLatestShare = latestShare?.id === entry.id
 
           return (
             <article key={entry.id} className="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
@@ -51,6 +74,27 @@ export default function ScenarioLibrary({
                 </button>
               </div>
 
+              <div className="mt-3 rounded-lg border border-slate-800 bg-slate-950/80 p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-xs font-medium text-slate-300">
+                    {isLatestShare ? 'Lien unique prêt à partager' : 'Lien de partage'}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => copyShareUrl(shareUrl)}
+                    className="cta-soft min-h-9 rounded-md px-3 text-xs transition"
+                  >
+                    Copier le lien
+                  </button>
+                </div>
+                <a
+                  href={shareUrl}
+                  className="mt-2 block break-all text-xs leading-5 text-cyan-300 underline decoration-cyan-800 underline-offset-2"
+                >
+                  {shareUrl}
+                </a>
+              </div>
+
               <div className="mt-4 grid gap-2 sm:grid-cols-2">
                 <button
                   type="button"
@@ -63,9 +107,7 @@ export default function ScenarioLibrary({
                   type="button"
                   onClick={() => onToggle(entry.id)}
                   className={`min-h-11 rounded-lg px-4 text-sm font-medium transition ${
-                    isSelected
-                      ? 'cta-selected'
-                      : 'cta-secondary'
+                    isSelected ? 'cta-selected' : 'cta-secondary'
                   }`}
                 >
                   {isSelected ? 'Ajouté à la comparaison' : 'Ajouter à la comparaison'}
