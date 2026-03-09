@@ -129,6 +129,24 @@ npm run lint
 npm run preview
 ```
 
+### Vérifier l'accès Cloudflare
+
+```bash
+npm run cf:whoami
+```
+
+### Déployer manuellement
+
+```bash
+npm run deploy
+```
+
+Pour un test sans publication:
+
+```bash
+npm run deploy:dry-run
+```
+
 ## Structure du projet
 
 ```text
@@ -163,6 +181,43 @@ Le dépôt est pensé pour être partagé publiquement:
 - README orienté usage et compréhension métier.
 - Fichiers de template inutiles supprimés.
 - Métadonnées du package alignées avec le nom du projet.
+
+## Workflow Git et Cloudflare
+
+Organisation recommandée:
+
+- `main` = branche de production.
+- Toute évolution part d'une branche dédiée, idéalement préfixée `codex/`, `feat/` ou `fix/`.
+- Un `push` sur `main` déclenche automatiquement la validation puis le déploiement Cloudflare via GitHub Actions.
+
+Routine minimale:
+
+```bash
+git switch main
+git pull --ff-only
+git switch -c codex/ma-modif
+```
+
+Une fois la branche fusionnée dans `main`:
+
+```bash
+git branch -d codex/ma-modif
+```
+
+Si la branche est encore attachée à un worktree séparé, supprimer d'abord le worktree:
+
+```bash
+git worktree list
+git worktree remove /chemin/du/worktree
+git branch -d codex/ma-modif
+```
+
+Secrets GitHub requis pour la CI:
+
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
+
+Le token doit au minimum pouvoir déployer des Workers et gérer les routes associées.
 
 ## Crédits
 
