@@ -84,18 +84,31 @@ function formatInputValue(value) {
   return value === null || value === undefined ? '' : String(value)
 }
 
+function formatDisplayNumber(value, decimals = 0) {
+  if (value === null || value === undefined || value === '') {
+    return ''
+  }
+
+  return new Intl.NumberFormat('fr-FR', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: decimals,
+  }).format(Number(value))
+}
+
 function parseInputNumber(rawValue) {
   if (rawValue.trim() === '') {
     return null
   }
 
-  const normalized = rawValue.replace(',', '.')
+  const normalized = rawValue.replace(/\s/g, '').replace(/\u202f/g, '').replace(',', '.')
   const parsed = Number(normalized)
   return Number.isFinite(parsed) ? parsed : null
 }
 
 function NumberField({ label, helper, unit, value, onChange, step = 1, min = 0 }) {
   const [inputValue, setInputValue] = useState(() => formatInputValue(value))
+  const [isEditing, setIsEditing] = useState(false)
+  const displayValue = isEditing ? inputValue : formatDisplayNumber(value, step < 1 ? 1 : 0)
 
   useEffect(() => {
     setInputValue(formatInputValue(value))
@@ -109,6 +122,18 @@ function NumberField({ label, helper, unit, value, onChange, step = 1, min = 0 }
     onChange(nextValue)
   }
 
+  function adjustValue(direction) {
+    const currentValue = parseInputNumber(inputValue)
+    const fallbackValue = Number.isFinite(Number(value)) ? Number(value) : min
+    const baseValue = currentValue ?? fallbackValue
+    const nextValue = Math.max(baseValue + step * direction, min)
+    setIsEditing(false)
+    setInputValue(formatInputValue(nextValue))
+    onChange(nextValue)
+  }
+
+  const showStepper = step < 1
+
   return (
     <label className="space-y-2">
       <div className="flex items-center justify-between gap-3">
@@ -116,16 +141,47 @@ function NumberField({ label, helper, unit, value, onChange, step = 1, min = 0 }
         {unit ? <span className="text-xs text-slate-400">{unit}</span> : null}
       </div>
       <div className="rounded-3xl border border-white/10 bg-slate-950/70 px-4 py-4 transition focus-within:border-cyan-300/70 focus-within:ring-2 focus-within:ring-cyan-300/15">
-        <input
-          type="text"
-          inputMode={step < 1 ? 'decimal' : 'numeric'}
-          min={min}
-          step={step}
-          value={inputValue}
-          onChange={(event) => setInputValue(event.target.value)}
-          onBlur={(event) => commitValue(event.target.value)}
-          className="w-full bg-transparent text-lg text-white outline-none placeholder:text-slate-500"
-        />
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            inputMode={step < 1 ? 'decimal' : 'numeric'}
+            min={min}
+            step={step}
+            value={displayValue}
+            onFocus={() => {
+              setIsEditing(true)
+              setInputValue(formatInputValue(value))
+            }}
+            onChange={(event) => setInputValue(event.target.value)}
+            onBlur={(event) => {
+              commitValue(event.target.value)
+              setIsEditing(false)
+            }}
+            className="w-full bg-transparent text-lg text-white outline-none placeholder:text-slate-500"
+          />
+          {showStepper ? (
+            <div className="flex shrink-0 items-center gap-1">
+              <button
+                type="button"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => adjustValue(-1)}
+                className="cta-soft inline-flex h-10 w-10 items-center justify-center rounded-full text-base font-semibold"
+                aria-label={`Diminuer ${label}`}
+              >
+                -
+              </button>
+              <button
+                type="button"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => adjustValue(1)}
+                className="cta-soft inline-flex h-10 w-10 items-center justify-center rounded-full text-base font-semibold"
+                aria-label={`Augmenter ${label}`}
+              >
+                +
+              </button>
+            </div>
+          ) : null}
+        </div>
       </div>
       {helper ? <p className="text-sm leading-6 text-slate-400">{helper}</p> : null}
     </label>
