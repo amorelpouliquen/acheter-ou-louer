@@ -88,16 +88,21 @@ function buildLinePath(data, width, height, paddingX, paddingY, accessor, minVal
     .join(' ')
 }
 
-function TimelineChart({ points, crossoverYear, sensitivityTimeline, opportunityReturn, isMobile }) {
+function TimelineChart({ points, crossoverYear, sensitivityTimeline, opportunityReturn, isMobile, chartMode }) {
   const width = isMobile ? 320 : 760
   const height = isMobile ? 176 : 240
   const paddingX = isMobile ? 16 : 18
   const paddingY = isMobile ? 18 : 18
-  const toNetGain = (cost) => -cost
+  const transformValue = chartMode === 'gain' ? (value) => -value : (value) => value
+  const ownerLabel = chartMode === 'gain' ? 'Gain net achat' : 'Achat net'
+  const rentLabel = chartMode === 'gain' ? 'Gain net location' : 'Location nette'
   const chartValues = [
-    ...points.flatMap((point) => [toNetGain(point.ownerNetCost), toNetGain(point.rentNetCost)]),
-    ...(sensitivityTimeline?.plus?.points ?? []).map((point) => toNetGain(point.rentNetCost)),
-    ...(sensitivityTimeline?.minus?.points ?? []).map((point) => toNetGain(point.rentNetCost)),
+    ...points.flatMap((point) => [
+      transformValue(point.ownerNetCost),
+      transformValue(point.rentNetCost),
+    ]),
+    ...(sensitivityTimeline?.plus?.points ?? []).map((point) => transformValue(point.rentNetCost)),
+    ...(sensitivityTimeline?.minus?.points ?? []).map((point) => transformValue(point.rentNetCost)),
   ]
   const minValue = Math.min(...chartValues, 0)
   const maxValue = Math.max(...chartValues, 0)
@@ -108,7 +113,7 @@ function TimelineChart({ points, crossoverYear, sensitivityTimeline, opportunity
     height,
     paddingX,
     paddingY,
-    (point) => toNetGain(point.ownerNetCost),
+    (point) => transformValue(point.ownerNetCost),
     minValue,
     maxValue,
   )
@@ -118,7 +123,7 @@ function TimelineChart({ points, crossoverYear, sensitivityTimeline, opportunity
     height,
     paddingX,
     paddingY,
-    (point) => toNetGain(point.rentNetCost),
+    (point) => transformValue(point.rentNetCost),
     minValue,
     maxValue,
   )
@@ -129,7 +134,7 @@ function TimelineChart({ points, crossoverYear, sensitivityTimeline, opportunity
         height,
         paddingX,
         paddingY,
-        (point) => toNetGain(point.rentNetCost),
+        (point) => transformValue(point.rentNetCost),
         minValue,
         maxValue,
       )
@@ -141,7 +146,7 @@ function TimelineChart({ points, crossoverYear, sensitivityTimeline, opportunity
         height,
         paddingX,
         paddingY,
-        (point) => toNetGain(point.rentNetCost),
+        (point) => transformValue(point.rentNetCost),
         minValue,
         maxValue,
       )
@@ -151,7 +156,7 @@ function TimelineChart({ points, crossoverYear, sensitivityTimeline, opportunity
     ? paddingX + ((crossoverPoint.year - 1) / Math.max(points.length - 1, 1)) * (width - paddingX * 2)
     : null
   const crossoverY = crossoverPoint
-    ? toChartY(toNetGain(crossoverPoint.ownerNetCost), minValue, maxValue, height, paddingY)
+    ? toChartY(transformValue(crossoverPoint.ownerNetCost), minValue, maxValue, height, paddingY)
     : null
   const visibleLabels = isMobile
     ? [points[0], points[Math.floor(points.length / 2)], points[points.length - 1]].filter(Boolean)
@@ -162,11 +167,11 @@ function TimelineChart({ points, crossoverYear, sensitivityTimeline, opportunity
       <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
         <div className="flex items-center gap-2">
           <span className="inline-block h-2.5 w-2.5 rounded-full bg-cyan-400" />
-          Gain net achat
+          {ownerLabel}
         </div>
         <div className="flex items-center gap-2">
           <span className="inline-block h-2.5 w-2.5 rounded-full bg-rose-400" />
-          Gain net location
+          {rentLabel}
         </div>
         <div className="flex items-center gap-2">
           <span className="inline-block h-2.5 w-2.5 rounded-full border border-rose-300" />
@@ -224,8 +229,8 @@ function TimelineChart({ points, crossoverYear, sensitivityTimeline, opportunity
           {(!isMobile ? points : visibleLabels).map((point, index) => {
             const pointIndex = points.findIndex((entry) => entry.year === point.year)
             const x = paddingX + (pointIndex / Math.max(points.length - 1, 1)) * (width - paddingX * 2)
-            const ownerY = toChartY(toNetGain(point.ownerNetCost), minValue, maxValue, height, paddingY)
-            const rentY = toChartY(toNetGain(point.rentNetCost), minValue, maxValue, height, paddingY)
+            const ownerY = toChartY(transformValue(point.ownerNetCost), minValue, maxValue, height, paddingY)
+            const rentY = toChartY(transformValue(point.rentNetCost), minValue, maxValue, height, paddingY)
 
             return (
               <g key={`${point.year}-${index}`}>
@@ -295,6 +300,8 @@ export default function ResultsSummary({
   formatCurrency,
   isMobile,
 }) {
+  const [chartMode, setChartMode] = useState('cost')
+
   return (
     <div className="space-y-4">
       <section className="grid gap-3 lg:grid-cols-4 2xl:grid-cols-4">
@@ -471,10 +478,32 @@ export default function ResultsSummary({
 
       <SectionCard
         eyebrow="Evolution"
-        title="Courbe de gain net (plus haut = mieux)"
+        title={chartMode === 'gain' ? 'Courbe de gain net' : 'Courbe de coût net'}
         aside={
-          <div className="rounded-md border border-slate-800 bg-slate-950 px-2.5 py-1 text-xs text-slate-400">
-            1 à 25 ans
+          <div className="flex items-center gap-2">
+            <div className="inline-flex rounded-md border border-slate-800 bg-slate-950 p-0.5 text-xs">
+              <button
+                type="button"
+                onClick={() => setChartMode('cost')}
+                className={`rounded px-2 py-1 transition ${
+                  chartMode === 'cost' ? 'bg-slate-800 text-slate-100' : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                Coût net
+              </button>
+              <button
+                type="button"
+                onClick={() => setChartMode('gain')}
+                className={`rounded px-2 py-1 transition ${
+                  chartMode === 'gain' ? 'bg-slate-800 text-slate-100' : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                Gain net
+              </button>
+            </div>
+            <div className="rounded-md border border-slate-800 bg-slate-950 px-2.5 py-1 text-xs text-slate-400">
+              1 à 25 ans
+            </div>
           </div>
         }
       >
@@ -484,8 +513,10 @@ export default function ResultsSummary({
           sensitivityTimeline={sensitivityTimeline}
           opportunityReturn={inputs.opportunityReturn}
           isMobile={isMobile}
+          chartMode={chartMode}
         />
       </SectionCard>
     </div>
   )
 }
+import { useState } from 'react'
