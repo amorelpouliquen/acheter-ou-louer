@@ -1,7 +1,7 @@
 {
   "name": "Louer ou acheter - Simulateur",
   "short_name": "Louer ou acheter",
-  "description": "Simulateur immobilier pour comparer le cout reel entre louer et acheter sa residence principale.",
+  "description": "Simulateur immobilier pour comparer le coût réel entre louer et acheter sa résidence principale.",
   "lang": "fr-FR",
   "start_url": "/",
   "display": "standalone",

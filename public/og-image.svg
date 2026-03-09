@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
   <title id="title">Louer ou acheter - Simulateur</title>
-  <desc id="desc">Visuel social du simulateur achat vs location immobiliere.</desc>
+  <desc id="desc">Visuel social du simulateur achat vs location immobilière.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#020617" />
@@ -73,7 +73,7 @@
       font-size="26"
       font-weight="500"
     >
-      Credit, apport, frais, charges, horizon et rendement alternatif
+      Crédit, apport, frais, charges, horizon et rendement alternatif
     </text>
   </g>
 
@@ -98,7 +98,7 @@
       font-size="28"
       font-weight="800"
     >
-      Cout net reel
+      Coût net réel
     </text>
   </g>
 
@@ -148,7 +148,7 @@
       font-size="28"
       font-weight="800"
     >
-      Jusqu'a 25 ans
+      Jusqu'à 25 ans
     </text>
   </g>
 </svg>

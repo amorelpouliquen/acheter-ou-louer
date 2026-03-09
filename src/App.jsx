@@ -733,7 +733,7 @@ function SiteFooter() {
           <div>
             <p className="text-sm font-semibold text-slate-100">Louer ou acheter</p>
             <p className="mt-1 text-sm leading-6 text-slate-400">
-              Simulateur achat vs location. Merci a Chicago Boy pour l'inspiration du projet.
+              Simulateur achat vs location. Merci à Chicago Boy pour l'inspiration du projet.
             </p>
           </div>
         </div>
@@ -753,7 +753,7 @@ function SiteFooter() {
             rel="noreferrer"
             className="inline-flex min-h-10 items-center rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm font-medium text-slate-200 transition hover:border-cyan-700 hover:text-cyan-200"
           >
-            Inspiration: @ChicagoBoyFR
+            Inspiration : @ChicagoBoyFR
           </a>
         </div>
       </div>

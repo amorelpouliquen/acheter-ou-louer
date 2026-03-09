@@ -326,7 +326,7 @@ export default function ResultsSummary({
         <KeyFigure
           label="Mensualité crédit"
           value={formatCurrency(scenario.monthlyLoanPayment)}
-          helper={`${inputs.horizonYears} ans observes`}
+          helper={`${inputs.horizonYears} ans observés`}
         />
       </section>
 

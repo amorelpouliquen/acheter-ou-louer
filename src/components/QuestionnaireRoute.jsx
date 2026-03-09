@@ -11,55 +11,55 @@ const QUESTION_STEPS = [
   },
   {
     id: 'scenarioName',
-    eyebrow: 'Etape 1',
+    eyebrow: 'Étape 1',
     title: 'Comment voulez-vous nommer cette simulation ?',
     description: 'Ce nom sera repris dans le simulateur pour retrouver facilement votre brouillon.',
   },
   {
     id: 'pricingMode',
-    eyebrow: 'Etape 2',
+    eyebrow: 'Étape 2',
     title: 'Comment souhaitez-vous saisir les prix ?',
     description: 'Choisissez le format qui correspond le mieux aux annonces que vous consultez.',
   },
   {
     id: 'surfaceSqm',
-    eyebrow: 'Etape 3',
+    eyebrow: 'Étape 3',
     title: 'Quelle surface souhaitez-vous comparer ?',
     description: 'La surface sert à convertir automatiquement les montants si vous utilisez un prix au m².',
   },
   {
     id: 'purchase',
-    eyebrow: 'Etape 4',
-    title: "Quel est le cout cote achat ?",
-    description: "Renseignez le prix du bien et les charges proprietaire qui vont avec.",
+    eyebrow: 'Étape 4',
+    title: "Quel est le coût côté achat ?",
+    description: 'Renseignez le prix du bien et les charges propriétaire associées.',
   },
   {
     id: 'rent',
-    eyebrow: 'Etape 5',
-    title: 'Quel est le cout cote location ?',
-    description: 'Renseignez le loyer vise ainsi que les charges locataire associees.',
+    eyebrow: 'Étape 5',
+    title: 'Quel est le coût côté location ?',
+    description: 'Renseignez le loyer visé ainsi que les charges locataire associées.',
   },
   {
     id: 'downPayment',
-    eyebrow: 'Etape 6',
+    eyebrow: 'Étape 6',
     title: 'Quel apport pouvez-vous mobiliser ?',
     description: "L'apport influence le montant emprunté et donc le coût du crédit.",
   },
   {
     id: 'financing',
-    eyebrow: 'Etape 7',
+    eyebrow: 'Étape 7',
     title: 'Quel financement anticipez-vous ?',
-    description: 'Taux et duree de credit sont saisis ensemble pour estimer la mensualite.',
+    description: 'Taux et durée de crédit sont saisis ensemble pour estimer la mensualité.',
   },
   {
     id: 'opportunityReturn',
-    eyebrow: 'Etape 8',
-    title: 'Quel rendement alternatif retenir pour votre epargne ?',
-    description: "C'est le rendement estime du capital que vous pourriez placer au lieu de l'immobiliser dans l'achat.",
+    eyebrow: 'Étape 8',
+    title: 'Quel rendement alternatif retenir pour votre épargne ?',
+    description: "C'est le rendement estimé du capital que vous pourriez placer au lieu de l'immobiliser dans l'achat.",
   },
   {
     id: 'horizonYears',
-    eyebrow: 'Etape 9',
+    eyebrow: 'Étape 9',
     title: 'Combien de temps pensez-vous garder ce logement ?',
     description: "C'est l'hypothèse la plus importante pour arbitrer entre location et achat.",
   },
@@ -278,7 +278,7 @@ function buildStepContent(step, draft, pricingModes, updateInput) {
         <div className="grid gap-3 sm:grid-cols-2">
           <ChoiceCard
             title="Prix complet"
-            description="Vous connaissez deja le prix total d'achat et le loyer mensuel."
+            description="Vous connaissez déjà le prix total d'achat et le loyer mensuel."
             selected={draft.pricingMode === pricingModes.total}
             onClick={() => updateInput('pricingMode', pricingModes.total)}
           />
@@ -309,7 +309,7 @@ function buildStepContent(step, draft, pricingModes, updateInput) {
           {draft.pricingMode === pricingModes.total ? (
             <NumberField
               label="Prix d'achat"
-              helper="Le montant total affiche dans les annonces ou retenu pour votre offre."
+              helper="Le montant total affiché dans les annonces ou retenu pour votre offre."
               unit="EUR"
               value={draft.purchasePrice}
               onChange={(value) => updateInput('purchasePrice', value)}
@@ -326,16 +326,16 @@ function buildStepContent(step, draft, pricingModes, updateInput) {
             />
           )}
           <NumberField
-            label="Charges proprietaire"
-            helper="Charges de copropriete supportees en tant que proprietaire."
+            label="Charges propriétaire"
+            helper="Charges de copropriété supportées en tant que propriétaire."
             unit="EUR/mois"
             value={draft.ownerMonthlyCharges}
             onChange={(value) => updateInput('ownerMonthlyCharges', value)}
             step={10}
           />
           <NumberField
-            label="Taxe fonciere"
-            helper="Montant annuel estime."
+            label="Taxe foncière"
+            helper="Montant annuel estimé."
             unit="EUR/an"
             value={draft.yearlyPropertyTax}
             onChange={(value) => updateInput('yearlyPropertyTax', value)}
@@ -376,7 +376,7 @@ function buildStepContent(step, draft, pricingModes, updateInput) {
           )}
           <NumberField
             label="Charges locataire"
-            helper="Part des charges supportees en location."
+            helper="Part des charges supportées en location."
             unit="EUR/mois"
             value={draft.renterMonthlyCharges}
             onChange={(value) => updateInput('renterMonthlyCharges', value)}
@@ -402,7 +402,7 @@ function buildStepContent(step, draft, pricingModes, updateInput) {
         <div className="grid gap-4 sm:grid-cols-2">
           <NumberField
             label="Taux du crédit"
-            helper="Exemple: 3,6 pour 3,6 %."
+            helper="Exemple : 3,6 pour 3,6 %."
             unit="%"
             value={draft.mortgageRate}
             onChange={(value) => updateInput('mortgageRate', value)}
@@ -410,7 +410,7 @@ function buildStepContent(step, draft, pricingModes, updateInput) {
           />
           <NumberField
             label="Durée du crédit"
-            helper="Exemple: 20 ans"
+            helper="Exemple : 20 ans"
             unit="ans"
             value={draft.loanDurationYears}
             onChange={(value) => updateInput('loanDurationYears', value)}
@@ -422,7 +422,7 @@ function buildStepContent(step, draft, pricingModes, updateInput) {
       return (
         <NumberField
           label="Rendement alternatif"
-          helper="Exemple: 5 pour simuler un placement net annualise a 5 %."
+          helper="Exemple : 5 pour simuler un placement net annualisé à 5 %."
           unit="%"
           value={draft.opportunityReturn}
           onChange={(value) => updateInput('opportunityReturn', value)}
@@ -433,8 +433,8 @@ function buildStepContent(step, draft, pricingModes, updateInput) {
     case 'horizonYears':
       return (
         <NumberField
-          label="Horizon de detention"
-          helper="C'est la duree pendant laquelle vous pensez rester avant de revendre ou de partir."
+          label="Horizon de détention"
+          helper="C'est la durée pendant laquelle vous pensez rester avant de revendre ou de partir."
           unit="ans"
           value={draft.horizonYears}
           onChange={(value) => updateInput('horizonYears', value)}
@@ -516,22 +516,23 @@ export default function QuestionnaireRoute({
                       </div>
                       <p className="mt-2 text-sm leading-6 text-slate-300">
                         Construire une simulation lisible avec uniquement les variables qui changent vraiment la decision.
+                        Construire une simulation lisible avec uniquement les variables qui changent vraiment la décision.
                       </p>
                     </div>
                     <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
                       <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-200/70">
-                        Duree
+                        Durée
                       </div>
                       <p className="mt-2 text-sm leading-6 text-slate-300">
-                        Parcours pense pour etre rempli en moins de 2 minutes, sans reglages techniques au depart.
+                        Parcours pensé pour être rempli en moins de 2 minutes, sans réglages techniques au départ.
                       </p>
                     </div>
                     <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
                       <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-200/70">
-                        Arrivee
+                        Arrivée
                       </div>
                       <p className="mt-2 text-sm leading-6 text-slate-300">
-                        A la fin, vous arrivez directement sur le simulateur complet avec vos choix deja appliques.
+                        À la fin, vous arrivez directement sur le simulateur complet avec vos choix déjà appliqués.
                       </p>
                     </div>
                   </div>
@@ -573,7 +574,7 @@ export default function QuestionnaireRoute({
 
           <aside className="rounded-[32px] border border-white/10 bg-white/[0.04] p-5 sm:p-6">
             <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-200/70">
-              Resume live
+              Résumé live
             </div>
             <div className="mt-2 text-xl font-semibold text-white">{derivedValues.scenarioName}</div>
 
@@ -583,12 +584,12 @@ export default function QuestionnaireRoute({
                   Surface
                 </div>
                 <div className="mt-1 text-base font-semibold text-white">
-                  {formatNumber(derivedValues.surfaceSqm)} m2
+                  {formatNumber(derivedValues.surfaceSqm)} m²
                 </div>
               </div>
               <div className="rounded-2xl border border-white/10 bg-slate-950/50 px-4 py-3">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                  Achat estime
+                  Achat estimé
                 </div>
                 <div className="mt-1 text-base font-semibold text-white">
                   {formatCurrency(derivedValues.purchasePrice)}
@@ -596,7 +597,7 @@ export default function QuestionnaireRoute({
               </div>
               <div className="rounded-2xl border border-white/10 bg-slate-950/50 px-4 py-3">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                  Loyer estime
+                  Loyer estimé
                 </div>
                 <div className="mt-1 text-base font-semibold text-white">
                   {formatCurrency(derivedValues.monthlyRent)}
@@ -611,7 +612,7 @@ export default function QuestionnaireRoute({
             </div>
 
             <p className="mt-5 text-sm leading-6 text-slate-400">
-              Les hypotheses avancees du simulateur restent disponibles ensuite si vous voulez affiner les frais, les charges ou le rendement alternatif.
+              Les hypothèses avancées du simulateur restent disponibles ensuite si vous voulez affiner les frais, les charges ou le rendement alternatif.
             </p>
           </aside>
         </div>
