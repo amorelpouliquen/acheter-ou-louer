@@ -213,7 +213,7 @@ const FIELD_META = {
     label: 'Inflation loyers',
     unit: '%',
     type: 'number',
-    min: 0,
+    min: -20,
     step: 0.1,
     decimals: true,
     placeholder: '2',
@@ -223,7 +223,7 @@ const FIELD_META = {
     label: 'Valorisation du bien',
     unit: '%',
     type: 'number',
-    min: 0,
+    min: -20,
     step: 0.1,
     decimals: true,
     placeholder: '2',
@@ -233,7 +233,7 @@ const FIELD_META = {
     label: 'Rendement alternatif',
     unit: '%',
     type: 'number',
-    min: 0,
+    min: -20,
     step: 0.1,
     decimals: true,
     placeholder: '5',
@@ -511,7 +511,7 @@ function amortizeLoan(principal, yearlyRate, durationYears, monthsObserved) {
 }
 
 function futureValue(capital, yearlyRate, years) {
-  if (capital <= 0 || yearlyRate <= 0 || years <= 0) {
+  if (capital <= 0 || years <= 0) {
     return capital
   }
 
@@ -667,10 +667,8 @@ function computeTimeline(inputs) {
 }
 
 function computeSensitivityTimeline(inputs, delta) {
-  const adjustedReturn = Math.max(
-    (Number(inputs.opportunityReturn) || CALCULATION_INPUT_DEFAULTS.opportunityReturn) + delta,
-    0,
-  )
+  const adjustedReturn =
+    (Number(inputs.opportunityReturn) || CALCULATION_INPUT_DEFAULTS.opportunityReturn) + delta
   return computeTimeline({ ...inputs, opportunityReturn: adjustedReturn })
 }
 

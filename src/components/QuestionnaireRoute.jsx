@@ -427,6 +427,7 @@ function buildStepContent(step, draft, pricingModes, updateInput) {
           value={draft.opportunityReturn}
           onChange={(value) => updateInput('opportunityReturn', value)}
           step={0.1}
+          min={-20}
         />
       )
 
