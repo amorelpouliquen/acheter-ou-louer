@@ -30,14 +30,14 @@ const QUESTION_STEPS = [
   {
     id: 'purchase',
     eyebrow: 'Etape 4',
-    title: "Quel est le prix d'achat visé ?",
-    description: "Selon le mode choisi, indiquez un prix total ou un prix au mètre carré.",
+    title: "Quel est le cout cote achat ?",
+    description: "Renseignez le prix du bien et les charges proprietaire qui vont avec.",
   },
   {
     id: 'rent',
     eyebrow: 'Etape 5',
-    title: 'Quel loyer voulez-vous comparer ?',
-    description: 'Renseignez le loyer total ou le loyer au m² pour le bien équivalent.',
+    title: 'Quel est le cout cote location ?',
+    description: 'Renseignez le loyer vise ainsi que les charges locataire associees.',
   },
   {
     id: 'downPayment',
@@ -46,16 +46,16 @@ const QUESTION_STEPS = [
     description: "L'apport influence le montant emprunté et donc le coût du crédit.",
   },
   {
-    id: 'mortgageRate',
+    id: 'financing',
     eyebrow: 'Etape 7',
-    title: 'Quel taux de crédit anticipez-vous ?',
-    description: 'Utilisez votre taux obtenu ou une hypothèse simple pour démarrer.',
+    title: 'Quel financement anticipez-vous ?',
+    description: 'Taux et duree de credit sont saisis ensemble pour estimer la mensualite.',
   },
   {
-    id: 'loanDurationYears',
+    id: 'opportunityReturn',
     eyebrow: 'Etape 8',
-    title: 'Sur combien d’années pensez-vous emprunter ?',
-    description: 'Cette durée sert à calculer la mensualité et le capital restant dû.',
+    title: 'Quel rendement alternatif retenir pour votre epargne ?',
+    description: "C'est le rendement estime du capital que vous pourriez placer au lieu de l'immobiliser dans l'achat.",
   },
   {
     id: 'horizonYears',
@@ -214,45 +214,85 @@ function buildStepContent(step, draft, pricingModes, updateInput) {
       )
 
     case 'purchase':
-      return draft.pricingMode === pricingModes.total ? (
-        <NumberField
-          label="Prix d'achat"
-          helper="Le montant total affiche dans les annonces ou retenu pour votre offre."
-          unit="EUR"
-          value={draft.purchasePrice}
-          onChange={(value) => updateInput('purchasePrice', value)}
-          step={1000}
-        />
-      ) : (
-        <NumberField
-          label="Prix d'achat au m²"
-          helper="Le simulateur recalculera automatiquement le prix total à partir de la surface."
-          unit="EUR/m²"
-          value={draft.purchasePricePerSqm}
-          onChange={(value) => updateInput('purchasePricePerSqm', value)}
-          step={100}
-        />
+      return (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {draft.pricingMode === pricingModes.total ? (
+            <NumberField
+              label="Prix d'achat"
+              helper="Le montant total affiche dans les annonces ou retenu pour votre offre."
+              unit="EUR"
+              value={draft.purchasePrice}
+              onChange={(value) => updateInput('purchasePrice', value)}
+              step={1000}
+            />
+          ) : (
+            <NumberField
+              label="Prix d'achat au m²"
+              helper="Le simulateur recalculera automatiquement le prix total à partir de la surface."
+              unit="EUR/m²"
+              value={draft.purchasePricePerSqm}
+              onChange={(value) => updateInput('purchasePricePerSqm', value)}
+              step={100}
+            />
+          )}
+          <NumberField
+            label="Charges proprietaire"
+            helper="Charges de copropriete supportees en tant que proprietaire."
+            unit="EUR/mois"
+            value={draft.ownerMonthlyCharges}
+            onChange={(value) => updateInput('ownerMonthlyCharges', value)}
+            step={10}
+          />
+          <NumberField
+            label="Taxe fonciere"
+            helper="Montant annuel estime."
+            unit="EUR/an"
+            value={draft.yearlyPropertyTax}
+            onChange={(value) => updateInput('yearlyPropertyTax', value)}
+            step={100}
+          />
+          <NumberField
+            label="Entretien"
+            helper="Budget annuel pour petits travaux et maintenance."
+            unit="EUR/an"
+            value={draft.yearlyMaintenanceBudget}
+            onChange={(value) => updateInput('yearlyMaintenanceBudget', value)}
+            step={100}
+          />
+        </div>
       )
 
     case 'rent':
-      return draft.pricingMode === pricingModes.total ? (
-        <NumberField
-          label="Loyer mensuel"
-          helper="Hors ou avec charges selon votre façon de raisonner, mais gardez la même logique partout."
-          unit="EUR/mois"
-          value={draft.monthlyRent}
-          onChange={(value) => updateInput('monthlyRent', value)}
-          step={50}
-        />
-      ) : (
-        <NumberField
-          label="Loyer au m²"
-          helper="Le loyer mensuel équivalent sera reconstitué automatiquement."
-          unit="EUR/m²/mois"
-          value={draft.monthlyRentPerSqm}
-          onChange={(value) => updateInput('monthlyRentPerSqm', value)}
-          step={1}
-        />
+      return (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {draft.pricingMode === pricingModes.total ? (
+            <NumberField
+              label="Loyer mensuel"
+              helper="Hors ou avec charges selon votre façon de raisonner, mais gardez la même logique partout."
+              unit="EUR/mois"
+              value={draft.monthlyRent}
+              onChange={(value) => updateInput('monthlyRent', value)}
+              step={50}
+            />
+          ) : (
+            <NumberField
+              label="Loyer au m²"
+              helper="Le loyer mensuel équivalent sera reconstitué automatiquement."
+              unit="EUR/m²/mois"
+              value={draft.monthlyRentPerSqm}
+              onChange={(value) => updateInput('monthlyRentPerSqm', value)}
+              step={1}
+            />
+          )}
+          <NumberField
+            label="Charges locataire"
+            helper="Part des charges supportees en location."
+            unit="EUR/mois"
+            value={draft.renterMonthlyCharges}
+            onChange={(value) => updateInput('renterMonthlyCharges', value)}
+            step={10}
+          />
+        </div>
       )
 
     case 'downPayment':
@@ -267,26 +307,36 @@ function buildStepContent(step, draft, pricingModes, updateInput) {
         />
       )
 
-    case 'mortgageRate':
+    case 'financing':
       return (
-        <NumberField
-          label="Taux du crédit"
-          helper="Exemple: 3,6 pour 3,6 %."
-          unit="%"
-          value={draft.mortgageRate}
-          onChange={(value) => updateInput('mortgageRate', value)}
-          step={0.1}
-        />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <NumberField
+            label="Taux du crédit"
+            helper="Exemple: 3,6 pour 3,6 %."
+            unit="%"
+            value={draft.mortgageRate}
+            onChange={(value) => updateInput('mortgageRate', value)}
+            step={0.1}
+          />
+          <NumberField
+            label="Durée du crédit"
+            helper="Exemple: 20 ans"
+            unit="ans"
+            value={draft.loanDurationYears}
+            onChange={(value) => updateInput('loanDurationYears', value)}
+          />
+        </div>
       )
 
-    case 'loanDurationYears':
+    case 'opportunityReturn':
       return (
         <NumberField
-          label="Durée du crédit"
-          helper="Exemple: 20 ans"
-          unit="ans"
-          value={draft.loanDurationYears}
-          onChange={(value) => updateInput('loanDurationYears', value)}
+          label="Rendement alternatif"
+          helper="Exemple: 5 pour simuler un placement net annualise a 5 %."
+          unit="%"
+          value={draft.opportunityReturn}
+          onChange={(value) => updateInput('opportunityReturn', value)}
+          step={0.1}
         />
       )
 
