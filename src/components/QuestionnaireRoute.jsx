@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 const QUESTION_STEPS = [
   {
@@ -157,7 +157,7 @@ function NumberField({ label, helper, unit, value, onChange, step = 1, min = 0 }
   const showStepper = step < 1
 
   return (
-    <label className="space-y-2">
+    <label className="space-y-2" data-question-field>
       <div className="flex items-center justify-between gap-3">
         <span className="text-sm font-medium text-slate-100">{label}</span>
       </div>
@@ -224,7 +224,7 @@ function NumberField({ label, helper, unit, value, onChange, step = 1, min = 0 }
 
 function TextField({ label, helper, value, onChange }) {
   return (
-    <label className="space-y-2">
+    <label className="space-y-2" data-question-field>
       <div className="text-sm font-medium text-slate-100">{label}</div>
       <div className="rounded-3xl border border-white/10 bg-slate-950/70 px-4 py-4 transition focus-within:border-cyan-300/70 focus-within:ring-2 focus-within:ring-cyan-300/15">
         <input
@@ -245,6 +245,7 @@ function ChoiceCard({ title, description, selected, onClick }) {
     <button
       type="button"
       onClick={onClick}
+      data-question-field
       className={`rounded-3xl border p-4 text-left transition ${
         selected
           ? 'cta-selected'
@@ -458,6 +459,8 @@ export default function QuestionnaireRoute({
 }) {
   const [stepIndex, setStepIndex] = useState(0)
   const [draft, setDraft] = useState(() => normalizeInputs(inputs))
+  const questionSectionRef = useRef(null)
+  const questionContentRef = useRef(null)
   const currentStep = QUESTION_STEPS[stepIndex]
   const questionCount = QUESTION_STEPS.length - 1
   const currentQuestionIndex = Math.max(stepIndex - 1, 0)
@@ -481,6 +484,24 @@ export default function QuestionnaireRoute({
     setStepIndex((current) => Math.max(current - 1, 0))
   }
 
+  useEffect(() => {
+    if (typeof window === 'undefined' || stepIndex === 0 || window.innerWidth >= 1024) {
+      return
+    }
+
+    requestAnimationFrame(() => {
+      const section = questionSectionRef.current
+      const firstField = questionContentRef.current?.querySelector('[data-question-field]')
+
+      if (firstField) {
+        firstField.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        return
+      }
+
+      section?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }, [stepIndex])
+
   return (
     <div className="min-h-screen bg-[#0b1120] text-slate-100">
       <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 py-4 sm:px-6 sm:py-6">
@@ -496,7 +517,10 @@ export default function QuestionnaireRoute({
         </div>
 
         <div className="grid flex-1 gap-4 lg:grid-cols-[minmax(0,1.1fr)_360px]">
-          <section className="rounded-[32px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(165,243,252,0.12),transparent_34%),linear-gradient(180deg,rgba(15,23,42,0.96),rgba(15,23,42,0.88))] p-6 shadow-[0_28px_80px_rgba(2,6,23,0.45)] sm:p-8">
+          <section
+            ref={questionSectionRef}
+            className="rounded-[32px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(165,243,252,0.12),transparent_34%),linear-gradient(180deg,rgba(15,23,42,0.96),rgba(15,23,42,0.88))] p-6 shadow-[0_28px_80px_rgba(2,6,23,0.45)] sm:p-8"
+          >
             <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-200">
               {currentStep.eyebrow}
             </div>
@@ -548,7 +572,9 @@ export default function QuestionnaireRoute({
                 </div>
               ) : (
                 <div className="space-y-6">
-                  <div className="max-w-xl">{buildStepContent(currentStep, draft, pricingModes, updateInput)}</div>
+                  <div ref={questionContentRef} className="max-w-xl">
+                    {buildStepContent(currentStep, draft, pricingModes, updateInput)}
+                  </div>
 
                   <div className="flex flex-col gap-3 sm:flex-row">
                     <button
