@@ -1,12 +1,12 @@
 function SectionCard({ eyebrow, title, aside, children }) {
   return (
-    <section className="rounded-[24px] border border-white/10 bg-white/[0.03] p-4 sm:p-5">
+    <section className="rounded-2xl border border-slate-800 bg-slate-925/80 p-4">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-300/70">
+          <div className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
             {eyebrow}
           </div>
-          <h2 className="mt-1 text-xl font-semibold text-white">{title}</h2>
+          <h2 className="mt-1 text-lg font-semibold text-slate-50">{title}</h2>
         </div>
         {aside}
       </div>
@@ -17,31 +17,31 @@ function SectionCard({ eyebrow, title, aside, children }) {
 
 function KeyFigure({ label, value, helper, tone = 'slate' }) {
   const tones = {
-    slate: 'border-white/10 bg-slate-950/60',
-    cyan: 'border-cyan-400/20 bg-cyan-400/10',
-    green: 'border-emerald-400/20 bg-emerald-400/10',
-    red: 'border-rose-400/20 bg-rose-400/10',
+    slate: 'border-slate-800 bg-slate-950/70',
+    cyan: 'border-cyan-900/70 bg-cyan-950/30',
+    green: 'border-emerald-900/70 bg-emerald-950/30',
+    red: 'border-rose-900/70 bg-rose-950/30',
   }
 
   return (
-    <div className={`rounded-2xl border p-4 ${tones[tone]}`}>
-      <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</div>
-      <div className="mt-1.5 text-2xl font-semibold text-white">{value}</div>
-      {helper ? <div className="mt-1 text-sm text-slate-400">{helper}</div> : null}
+    <div className={`rounded-xl border p-4 ${tones[tone]}`}>
+      <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">{label}</div>
+      <div className="mt-1.5 text-2xl font-semibold text-slate-50">{value}</div>
+      {helper ? <div className="mt-1 text-xs text-slate-400">{helper}</div> : null}
     </div>
   )
 }
 
 function DisclosureRow({ label, value, tooltip, emphasize = false, positive = false, formatCurrency }) {
   return (
-    <details className="rounded-2xl border border-white/8 bg-slate-950/35 px-3 py-3">
+    <details className="rounded-xl border border-slate-800 bg-slate-950/50 px-3 py-3">
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
-        <span className={`min-w-0 text-sm ${emphasize ? 'font-semibold text-white' : 'text-slate-300'}`}>
+        <span className={`min-w-0 text-sm ${emphasize ? 'font-medium text-slate-100' : 'text-slate-400'}`}>
           {label}
         </span>
         <span
           className={`shrink-0 text-sm font-semibold ${
-            positive ? 'text-emerald-300' : emphasize ? 'text-white' : 'text-slate-100'
+            positive ? 'text-emerald-300' : emphasize ? 'text-slate-100' : 'text-slate-300'
           }`}
         >
           {formatCurrency(value)}
@@ -54,8 +54,8 @@ function DisclosureRow({ label, value, tooltip, emphasize = false, positive = fa
 
 function SummaryMetric({ label, value, helper, valueClassName = 'text-white' }) {
   return (
-    <div className="rounded-2xl border border-white/8 bg-slate-950/35 px-3 py-3">
-      <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</div>
+    <div className="rounded-xl border border-slate-800 bg-slate-950/50 px-3 py-3">
+      <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">{label}</div>
       <div className={`mt-1 text-sm font-semibold ${valueClassName}`}>{value}</div>
       {helper ? <div className="mt-1 text-xs text-slate-400">{helper}</div> : null}
     </div>
@@ -126,11 +126,11 @@ function TimelineChart({ points, crossoverYear, isMobile }) {
           Location nette
         </div>
         <div className="sm:ml-auto text-slate-500">
-          {crossoverYear ? `Croisement estime vers ${crossoverYear} ans` : 'Pas de croisement sur 25 ans'}
+          {crossoverYear ? `Croisement estimé vers ${crossoverYear} ans` : 'Pas de croisement sur 25 ans'}
         </div>
       </div>
 
-      <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3">
+      <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
         <svg viewBox={`0 0 ${width} ${height}`} className={`${isMobile ? 'h-44' : 'h-60'} w-full`}>
           {[0.33, 0.66, 1].map((ratio) => {
             const y = height - paddingY - ratio * (height - paddingY * 2)
@@ -202,12 +202,12 @@ function TimelineChart({ points, crossoverYear, isMobile }) {
 
       {isMobile ? (
         <div className="grid gap-2 sm:grid-cols-3">
-          <SummaryMetric label="Annee 1" value={new Intl.NumberFormat('fr-FR').format(points[0]?.year || 1)} />
+          <SummaryMetric label="Année 1" value={new Intl.NumberFormat('fr-FR').format(points[0]?.year || 1)} />
           <SummaryMetric
-            label="Annee mediane"
+            label="Année médiane"
             value={new Intl.NumberFormat('fr-FR').format(points[Math.floor(points.length / 2)]?.year || 13)}
           />
-          <SummaryMetric label="Annee finale" value={new Intl.NumberFormat('fr-FR').format(points[points.length - 1]?.year || 25)} />
+          <SummaryMetric label="Année finale" value={new Intl.NumberFormat('fr-FR').format(points[points.length - 1]?.year || 25)} />
         </div>
       ) : null}
     </div>
@@ -226,42 +226,42 @@ export default function ResultsSummary({
 }) {
   return (
     <div className="space-y-4">
-      <section className="grid gap-3 lg:grid-cols-4">
+      <section className="grid gap-3 lg:grid-cols-4 2xl:grid-cols-4">
         <KeyFigure
           label="Verdict"
           value={buyWins ? 'Acheter' : 'Louer'}
-          helper={`${formatCurrency(Math.abs(scenario.advantage))} d'ecart estime`}
+          helper={`${formatCurrency(Math.abs(scenario.advantage))} d'écart estimé`}
           tone={buyWins ? 'green' : 'red'}
         />
         <KeyFigure
-          label="Cout net achat"
+          label="Coût net achat"
           value={formatCurrency(scenario.ownerNetCost)}
           helper={`Patrimoine ${formatCurrency(scenario.propertyValue)}`}
           tone="cyan"
         />
         <KeyFigure
-          label="Cout net location"
+          label="Coût net location"
           value={formatCurrency(scenario.rentNetCost)}
           helper={`Capital place ${formatCurrency(scenario.renterInvestmentGain)}`}
         />
         <KeyFigure
-          label="Mensualite credit"
+          label="Mensualité crédit"
           value={formatCurrency(scenario.monthlyLoanPayment)}
           helper={`${inputs.horizonYears} ans observes`}
         />
       </section>
 
-      <section className="grid gap-4 xl:grid-cols-2">
+      <section className="grid gap-4 2xl:grid-cols-2">
         <SectionCard
           eyebrow="Achat"
-          title="Lecture rapide du cout"
+          title="Lecture rapide du coût"
           aside={
-            <div className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 text-xs text-emerald-200">
+            <div className="rounded-md border border-emerald-900/70 bg-emerald-950/30 px-2.5 py-1 text-xs text-emerald-300">
               Valeur finale {formatCurrency(scenario.propertyValue)}
             </div>
           }
         >
-          <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_240px]">
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.9fr)]">
             <div className="space-y-2">
               <DisclosureRow
                 label="Prix du bien"
@@ -276,7 +276,7 @@ export default function ResultsSummary({
                 formatCurrency={formatCurrency}
               />
               <DisclosureRow
-                label="Interets payes"
+                label="Intérêts payés"
                 value={scenario.interestPaid}
                 tooltip={purchaseTooltips.interestPaid}
                 formatCurrency={formatCurrency}
@@ -288,19 +288,19 @@ export default function ResultsSummary({
                 formatCurrency={formatCurrency}
               />
               <DisclosureRow
-                label="Cout d'opportunite"
+                label="Coût d’opportunité"
                 value={scenario.investedCapitalGain}
                 tooltip={purchaseTooltips.investedCapitalGain}
                 formatCurrency={formatCurrency}
               />
               <DisclosureRow
-                label="Capital restant du"
+                label="Capital restant dû"
                 value={scenario.remainingBalance}
                 tooltip={purchaseTooltips.remainingBalance}
                 formatCurrency={formatCurrency}
               />
               <DisclosureRow
-                label="Cout net achat"
+                label="Coût net achat"
                 value={scenario.ownerNetCost}
                 tooltip={purchaseTooltips.ownerNetCost}
                 emphasize
@@ -310,28 +310,28 @@ export default function ResultsSummary({
 
             <div className="grid gap-2">
               <SummaryMetric
-                label="Apport mobilise"
+                label="Apport mobilisé"
                 value={formatCurrency(Math.min(inputs.downPayment, scenario.totalAcquisitionCost))}
               />
-              <SummaryMetric label="Montant emprunte" value={formatCurrency(scenario.loanPrincipal)} />
-              <SummaryMetric label="Principal rembourse" value={formatCurrency(scenario.principalPaid)} />
+              <SummaryMetric label="Montant emprunté" value={formatCurrency(scenario.loanPrincipal)} />
+              <SummaryMetric label="Principal remboursé" value={formatCurrency(scenario.principalPaid)} />
             </div>
           </div>
         </SectionCard>
 
         <SectionCard
           eyebrow="Location"
-          title="Lecture rapide du cout"
+          title="Lecture rapide du coût"
           aside={
-            <div className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1.5 text-xs text-cyan-200">
+            <div className="rounded-md border border-cyan-900/70 bg-cyan-950/30 px-2.5 py-1 text-xs text-cyan-300">
               Loyer initial {formatCurrency(scenario.monthlyRent)}
             </div>
           }
         >
-          <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_240px]">
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.9fr)]">
             <div className="space-y-2">
               <DisclosureRow
-                label="Loyers verses"
+                label="Loyers versés"
                 value={scenario.totalRentPaid}
                 tooltip={rentalTooltips.totalRentPaid}
                 formatCurrency={formatCurrency}
@@ -350,7 +350,7 @@ export default function ResultsSummary({
                 formatCurrency={formatCurrency}
               />
               <DisclosureRow
-                label="Cout net location"
+                label="Coût net location"
                 value={scenario.rentNetCost}
                 tooltip={rentalTooltips.rentNetCost}
                 emphasize
@@ -359,9 +359,9 @@ export default function ResultsSummary({
             </div>
 
             <div className="grid gap-2">
-              <SummaryMetric label="Capital place" value={formatCurrency(scenario.renterInvestedCapital)} />
+              <SummaryMetric label="Capital placé" value={formatCurrency(scenario.renterInvestedCapital)} />
               <SummaryMetric
-                label="Rendement cumule"
+                label="Rendement cumulé"
                 value={formatCurrency(scenario.renterInvestmentGain)}
                 valueClassName="text-emerald-300"
               />
@@ -373,10 +373,10 @@ export default function ResultsSummary({
 
       <SectionCard
         eyebrow="Evolution"
-        title="Courbe de cout net"
+          title="Courbe de coût net"
         aside={
-          <div className="rounded-full border border-white/10 bg-slate-950/70 px-3 py-1.5 text-xs text-slate-400">
-            1 a 25 ans
+          <div className="rounded-md border border-slate-800 bg-slate-950 px-2.5 py-1 text-xs text-slate-400">
+            1 à 25 ans
           </div>
         }
       >

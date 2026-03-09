@@ -1,81 +1,50 @@
-function TopMetric({ label, value, helper }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
-      <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-200/70">
-        {label}
-      </div>
-      <div className="mt-1 text-base font-semibold text-white">{value}</div>
-      {helper ? <div className="mt-1 text-xs text-slate-300">{helper}</div> : null}
-    </div>
-  )
-}
+import { assetUrl } from '../baseUrl'
 
-export default function HeaderSummary({
-  inputs,
-  scenario,
-  buyWins,
-  formatCurrency,
-  formatNumber,
-  activeSection,
-  onSectionChange,
-  isMobile,
-}) {
+export default function HeaderSummary({ buyWins, activeSection, onSectionChange, isMobile }) {
   const sections = [
-    { id: 'params', label: 'Parametres' },
-    { id: 'results', label: 'Resultat' },
+    { id: 'params', label: 'Paramètres' },
+    { id: 'results', label: 'Résultats' },
     { id: 'compare', label: 'Comparer' },
-    { id: 'library', label: 'Scenarios' },
+    { id: 'library', label: 'Scénarios' },
   ]
 
   return (
-    <div className="rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.18),transparent_42%),linear-gradient(180deg,rgba(15,23,42,0.96),rgba(15,23,42,0.88))] shadow-[0_28px_80px_rgba(2,6,23,0.45)]">
-      <header className="px-4 py-4 sm:px-6 sm:py-5">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div className="rounded-2xl border border-slate-800 bg-slate-900 shadow-[0_20px_60px_rgba(2,6,23,0.45)]">
+      <header className="px-4 py-4 sm:px-5">
+        <div className="flex items-start gap-4">
+          <img
+            src={assetUrl('favicon.svg')}
+            alt="Logo Louer ou acheter"
+            className="h-14 w-14 shrink-0 rounded-2xl border border-slate-800 bg-slate-950 p-2 shadow-[0_10px_30px_rgba(2,6,23,0.35)] sm:h-16 sm:w-16"
+          />
           <div className="max-w-2xl">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300">
+            <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-300">
               Comparateur immobilier
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-2">
-              <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+              <h1 className="text-2xl font-semibold tracking-tight text-slate-50 sm:text-3xl">
                 Louer ou acheter
               </h1>
               <span
-                className={`inline-flex min-h-10 items-center rounded-full border px-3 text-sm font-medium ${
+                className={`inline-flex min-h-9 items-center rounded-md border px-2.5 text-xs font-medium ${
                   buyWins
-                    ? 'border-emerald-400/30 bg-emerald-400/15 text-emerald-200'
-                    : 'border-rose-400/30 bg-rose-400/15 text-rose-200'
+                    ? 'border-emerald-900/70 bg-emerald-950/30 text-emerald-300'
+                    : 'border-rose-900/70 bg-rose-950/30 text-rose-300'
                 }`}
               >
-                Verdict: {buyWins ? 'Acheter' : 'Louer'}
+                Verdict {buyWins ? 'Acheter' : 'Louer'}
               </span>
             </div>
-            <p className="mt-2 max-w-xl text-sm leading-6 text-slate-300 sm:text-base">
-              Evaluez rapidement votre arbitrage residentiel avec un parcours mobile plus court,
-              centre sur l’essentiel puis sur le detail.
+            <p className="mt-1 text-sm font-medium text-slate-300">Simulateur achat vs location</p>
+            <p className="mt-2 max-w-xl text-sm leading-6 text-slate-400">
+              Comparez achat et location de résidence principale selon votre apport, votre crédit,
+              les frais d'acquisition, les charges et votre horizon de détention.
             </p>
-          </div>
-
-          <div className="grid gap-2 sm:grid-cols-3 lg:min-w-[420px]">
-            <TopMetric
-              label="Surface"
-              value={`${formatNumber(inputs.surfaceSqm)} m2`}
-              helper="Format saisi"
-            />
-            <TopMetric
-              label="Cout achat"
-              value={formatCurrency(scenario.ownerNetCost)}
-              helper={`Horizon ${inputs.horizonYears} ans`}
-            />
-            <TopMetric
-              label="Ecart"
-              value={formatCurrency(Math.abs(scenario.advantage))}
-              helper={buyWins ? 'Avantage achat' : 'Avantage location'}
-            />
           </div>
         </div>
       </header>
 
-      <div className="border-t border-white/10 px-2 py-2 sm:px-4">
+      <div className="border-t border-slate-800 px-2 py-2 sm:px-4">
         <nav
           className={`flex gap-2 overflow-x-auto px-2 pb-1 ${isMobile ? 'sticky top-0 z-30' : ''}`}
           aria-label="Navigation du simulateur"
@@ -88,10 +57,10 @@ export default function HeaderSummary({
                 key={section.id}
                 type="button"
                 onClick={() => onSectionChange(section.id)}
-                className={`inline-flex min-h-11 shrink-0 items-center rounded-full border px-4 text-sm font-medium transition ${
+                className={`inline-flex min-h-10 shrink-0 items-center rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
                   selected
-                    ? 'border-cyan-300/50 bg-cyan-400 text-slate-950'
-                    : 'border-white/10 bg-white/5 text-slate-200 hover:border-cyan-300/35 hover:bg-white/10'
+                    ? 'border-cyan-700 bg-slate-900 text-cyan-100'
+                    : 'border-slate-700 bg-slate-950 text-slate-300 hover:bg-slate-900'
                 }`}
                 aria-pressed={selected}
               >

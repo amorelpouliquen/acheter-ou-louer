@@ -8,23 +8,23 @@ export default function ScenarioLibrary({
   formatCurrency,
 }) {
   return (
-    <section className="rounded-[24px] border border-white/10 bg-white/[0.03] p-4 sm:p-5">
+    <section className="rounded-2xl border border-slate-800 bg-slate-925/80 p-4">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
-          <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-300/70">
-            Scenarios
+          <div className="text-[11px] uppercase tracking-[0.16em] text-slate-500">
+            Scénarios
           </div>
-          <h2 className="mt-1 text-xl font-semibold text-white">Bibliotheque</h2>
+          <h2 className="mt-1 text-lg font-semibold text-slate-50">Bibliothèque</h2>
         </div>
-        <div className="rounded-full border border-white/10 bg-slate-950/70 px-3 py-1.5 text-xs text-slate-400">
+        <div className="rounded-md border border-slate-800 bg-slate-950 px-2.5 py-1 text-xs text-slate-400">
           {savedScenarios.length}
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="grid gap-3 xl:grid-cols-2 2xl:grid-cols-3">
         {savedScenarios.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-white/10 bg-slate-950/30 px-4 py-5 text-sm text-slate-500">
-            Aucun scenario sauvegarde pour le moment.
+          <div className="xl:col-span-2 2xl:col-span-3 rounded-lg border border-dashed border-slate-800 bg-slate-950/50 px-4 py-5 text-sm text-slate-500">
+            Aucun scénario sauvegardé pour le moment.
           </div>
         ) : null}
 
@@ -32,20 +32,20 @@ export default function ScenarioLibrary({
           const isSelected = selectedIds.includes(entry.id)
 
           return (
-            <article key={entry.id} className="rounded-[22px] border border-white/10 bg-slate-950/50 p-4">
+            <article key={entry.id} className="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="truncate text-sm font-semibold text-white">{entry.name}</div>
                   <div className="mt-1 text-xs leading-5 text-slate-500">
                     {entry.inputs.pricingMode === pricingModes.sqm
-                      ? `${formatCurrency(entry.inputs.purchasePricePerSqm)}/m2 · ${formatCurrency(entry.inputs.monthlyRentPerSqm)}/m2`
+                      ? `${formatCurrency(entry.inputs.purchasePricePerSqm)}/m² · ${formatCurrency(entry.inputs.monthlyRentPerSqm)}/m²`
                       : `${formatCurrency(entry.inputs.purchasePrice)} · ${formatCurrency(entry.inputs.monthlyRent)}/mois`}
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => onDelete(entry.id)}
-                  className="min-h-10 rounded-xl border border-white/10 px-3 text-xs text-slate-400 transition hover:bg-white/5"
+                  className="cta-secondary min-h-10 rounded-md px-3 text-xs transition"
                 >
                   Supprimer
                 </button>
@@ -55,20 +55,20 @@ export default function ScenarioLibrary({
                 <button
                   type="button"
                   onClick={() => onLoad(entry)}
-                  className="min-h-11 rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-white transition hover:bg-white/10"
+                  className="cta-secondary min-h-11 rounded-lg px-4 text-sm font-medium transition"
                 >
-                  Charger ce scenario
+                  Charger ce scénario
                 </button>
                 <button
                   type="button"
                   onClick={() => onToggle(entry.id)}
-                  className={`min-h-11 rounded-2xl px-4 text-sm font-medium transition ${
+                  className={`min-h-11 rounded-lg px-4 text-sm font-medium transition ${
                     isSelected
-                      ? 'bg-cyan-400 text-slate-950'
-                      : 'border border-white/10 bg-transparent text-slate-200 hover:bg-white/5'
+                      ? 'cta-selected'
+                      : 'cta-secondary'
                   }`}
                 >
-                  {isSelected ? 'Ajoute a la comparaison' : 'Ajouter a la comparaison'}
+                  {isSelected ? 'Ajouté à la comparaison' : 'Ajouter à la comparaison'}
                 </button>
               </div>
             </article>
