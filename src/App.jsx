@@ -33,11 +33,11 @@ const EMPTY_INPUTS = {
   loanDurationYears: null,
   ownerMonthlyCharges: null,
   renterMonthlyCharges: null,
-  yearlyPropertyTax: null,
-  yearlyMaintenanceBudget: null,
-  yearlyRentInflation: null,
-  yearlyPropertyGrowth: null,
-  opportunityReturn: null,
+  yearlyPropertyTax: 2600,
+  yearlyMaintenanceBudget: 1200,
+  yearlyRentInflation: 2,
+  yearlyPropertyGrowth: 2,
+  opportunityReturn: 5,
 }
 
 const CALCULATION_INPUT_DEFAULTS = {
@@ -68,7 +68,7 @@ const FIELD_META = {
     id: 'scenarioName',
     label: 'Nom du scénario',
     type: 'text',
-    placeholder: 'Ex. Paris 15 - Base',
+    placeholder: '',
     helper: 'Permet de retrouver rapidement votre brouillon et vos variantes.',
   },
   surfaceSqm: {
@@ -78,7 +78,7 @@ const FIELD_META = {
     type: 'number',
     min: 1,
     step: 1,
-    placeholder: '65',
+    placeholder: '',
   },
   horizonYears: {
     id: 'horizonYears',
@@ -87,7 +87,7 @@ const FIELD_META = {
     type: 'number',
     min: 1,
     step: 1,
-    placeholder: '10',
+    placeholder: '',
     helper: 'Point clé du verdict. Modifiez-le avant d’ajuster les hypothèses fines.',
   },
   purchasePrice: {
@@ -97,7 +97,7 @@ const FIELD_META = {
     type: 'number',
     min: 0,
     step: 1000,
-    placeholder: '715000',
+    placeholder: '',
   },
   monthlyRent: {
     id: 'monthlyRent',
@@ -106,7 +106,7 @@ const FIELD_META = {
     type: 'number',
     min: 0,
     step: 50,
-    placeholder: '1950',
+    placeholder: '',
   },
   purchasePricePerSqm: {
     id: 'purchasePricePerSqm',
@@ -115,7 +115,7 @@ const FIELD_META = {
     type: 'number',
     min: 0,
     step: 100,
-    placeholder: '11000',
+    placeholder: '',
   },
   monthlyRentPerSqm: {
     id: 'monthlyRentPerSqm',
@@ -124,7 +124,7 @@ const FIELD_META = {
     type: 'number',
     min: 0,
     step: 1,
-    placeholder: '30',
+    placeholder: '',
   },
   downPayment: {
     id: 'downPayment',
@@ -181,7 +181,7 @@ const FIELD_META = {
     type: 'number',
     min: 0,
     step: 10,
-    placeholder: '330',
+    placeholder: '',
   },
   renterMonthlyCharges: {
     id: 'renterMonthlyCharges',
@@ -190,7 +190,7 @@ const FIELD_META = {
     type: 'number',
     min: 0,
     step: 10,
-    placeholder: '330',
+    placeholder: '',
   },
   yearlyPropertyTax: {
     id: 'yearlyPropertyTax',

@@ -250,6 +250,15 @@ export default function ScenarioForm({
 
   const financingFields = FORM_GROUPS.financing.map((id) => fieldMeta[id])
   const advancedFields = FORM_GROUPS.advanced.map((id) => fieldMeta[id])
+  const activeFieldIds = [...essentialFieldIds, ...FORM_GROUPS.financing, ...FORM_GROUPS.advanced]
+  const isFormComplete = activeFieldIds.every((id) => {
+    const value = inputs[id]
+    if (typeof value === 'string') {
+      return value.trim().length > 0
+    }
+
+    return value !== null && value !== undefined && Number.isFinite(Number(value))
+  })
   const desktopFieldGrid = isMobile
     ? 'grid gap-3 sm:grid-cols-2'
     : 'grid gap-3 md:grid-cols-2 xl:grid-cols-12'
@@ -329,31 +338,6 @@ export default function ScenarioForm({
               />
             </div>
 
-            {!isMobile ? (
-              <div className="grid gap-2 sm:grid-cols-3">
-                <button
-                  type="button"
-                  onClick={onShowResults}
-                  className="cta-primary min-h-11 rounded-lg px-4 text-sm font-semibold transition"
-                >
-                  Voir les résultats
-                </button>
-                <button
-                  type="button"
-                  onClick={onReset}
-                  className="cta-soft min-h-11 rounded-lg px-4 text-sm font-medium transition"
-                >
-                  Réinitialiser les valeurs
-                </button>
-                <button
-                  type="button"
-                  onClick={onSave}
-                  className="cta-secondary min-h-11 rounded-lg px-4 text-sm font-medium transition"
-                >
-                  Sauvegarder ce scénario
-                </button>
-              </div>
-            ) : null}
           </div>
         </FormCard>
 
@@ -400,35 +384,39 @@ export default function ScenarioForm({
                 </div>
               ))}
             </div>
+
+            {isFormComplete ? (
+              <div className="grid gap-2 sm:grid-cols-3">
+                <button
+                  type="button"
+                  onClick={onShowResults}
+                  className="cta-primary min-h-11 rounded-lg px-4 text-sm font-semibold transition"
+                >
+                  Voir les résultats
+                </button>
+                <button
+                  type="button"
+                  onClick={onReset}
+                  className="cta-soft min-h-11 rounded-lg px-4 text-sm font-medium transition"
+                >
+                  Réinitialiser les valeurs
+                </button>
+                <button
+                  type="button"
+                  onClick={onSave}
+                  className="cta-secondary min-h-11 rounded-lg px-4 text-sm font-medium transition"
+                >
+                  Sauvegarder ce scénario
+                </button>
+              </div>
+            ) : (
+              <p className="text-xs leading-5 text-slate-400">
+                Complétez tous les champs pour afficher les actions.
+              </p>
+            )}
           </div>
         </FormCard>
       </div>
-
-      {isMobile ? (
-        <div className="grid gap-2 sm:grid-cols-3">
-          <button
-            type="button"
-            onClick={onShowResults}
-            className="cta-primary min-h-11 rounded-lg px-4 text-sm font-semibold transition"
-          >
-            Voir les résultats
-          </button>
-          <button
-            type="button"
-            onClick={onReset}
-            className="cta-soft min-h-11 rounded-lg px-4 text-sm font-medium transition"
-          >
-            Réinitialiser les valeurs
-          </button>
-          <button
-            type="button"
-            onClick={onSave}
-            className="cta-secondary min-h-11 rounded-lg px-4 text-sm font-medium transition"
-          >
-            Sauvegarder ce scénario
-          </button>
-        </div>
-      ) : null}
     </div>
   )
 }
