@@ -205,19 +205,8 @@ function FormCard({ eyebrow, title, description, children }) {
   )
 }
 
-function MiniSummary({ label, value, helper }) {
-  return (
-    <div className="rounded-xl border border-slate-800 bg-slate-950/70 px-3 py-3">
-      <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">{label}</div>
-      <div className="mt-1 text-sm font-medium text-slate-100">{value}</div>
-      {helper ? <div className="mt-1 text-xs text-slate-400">{helper}</div> : null}
-    </div>
-  )
-}
-
 export default function ScenarioForm({
   inputs,
-  scenario,
   pricingModes,
   fieldMeta,
   onInputChange,
@@ -225,7 +214,6 @@ export default function ScenarioForm({
   onSave,
   onReset,
   onShowResults,
-  formatCurrency,
   isMobile,
 }) {
   const rateTripletIds = new Set([
@@ -318,24 +306,6 @@ export default function ScenarioForm({
                   </div>
                 )
               })}
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-3">
-              <MiniSummary
-                label="Verdict provisoire"
-                value={scenario.advantage > 0 ? 'Acheter' : 'Louer'}
-                helper={formatCurrency(Math.abs(scenario.advantage))}
-              />
-              <MiniSummary
-                label="Mensualité crédit"
-                value={formatCurrency(scenario.monthlyLoanPayment)}
-                helper={`CRD ${formatCurrency(scenario.remainingBalance)}`}
-              />
-              <MiniSummary
-                label="Loyer observé"
-                value={formatCurrency(scenario.monthlyRent)}
-                helper={`Horizon ${inputs.horizonYears ?? '—'} ans`}
-              />
             </div>
 
           </div>

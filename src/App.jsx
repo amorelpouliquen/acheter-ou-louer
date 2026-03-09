@@ -1,6 +1,7 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import ComparisonCards from './components/ComparisonCards.jsx'
 import HeaderSummary from './components/HeaderSummary.jsx'
+import QuestionnaireRoute from './components/QuestionnaireRoute.jsx'
 import ResultsSummary from './components/ResultsSummary.jsx'
 import ScenarioForm from './components/ScenarioForm.jsx'
 import ScenarioLibrary from './components/ScenarioLibrary.jsx'
@@ -11,7 +12,6 @@ const STORAGE_DB_NAME = 'simulateur-achat-db'
 const STORAGE_STORE_NAME = 'app-state'
 const STORAGE_RECORD_ID = 'saved-scenarios'
 const TIMELINE_YEARS = 25
-const QuestionnaireRoute = lazy(() => import('./components/QuestionnaireRoute.jsx'))
 const PRICING_MODES = {
   total: 'total',
   sqm: 'sqm',
@@ -69,7 +69,6 @@ const FIELD_META = {
     label: 'Nom du scénario',
     type: 'text',
     placeholder: '',
-    helper: 'Permet de retrouver rapidement votre brouillon et vos variantes.',
   },
   surfaceSqm: {
     id: 'surfaceSqm',
@@ -88,7 +87,6 @@ const FIELD_META = {
     min: 1,
     step: 1,
     placeholder: '',
-    helper: 'Point clé du verdict. Modifiez-le avant d’ajuster les hypothèses fines.',
   },
   purchasePrice: {
     id: 'purchasePrice',
@@ -730,16 +728,6 @@ function SiteFooter() {
   )
 }
 
-function RouteFallback() {
-  return (
-    <div className="min-h-screen bg-[#0b1120] px-4 py-8 text-slate-100">
-      <div className="mx-auto max-w-6xl rounded-3xl border border-slate-800 bg-slate-900/90 px-6 py-12 text-center shadow-[0_20px_60px_rgba(2,6,23,0.3)]">
-        <div className="text-sm font-medium text-slate-300">Chargement du questionnaire...</div>
-      </div>
-    </div>
-  )
-}
-
 function SimulatorPage({
   inputs,
   setInputs,
@@ -933,7 +921,6 @@ function SimulatorPage({
               <section ref={paramsRef}>
                 <ScenarioForm
                   inputs={inputs}
-                  scenario={scenario}
                   pricingModes={PRICING_MODES}
                   fieldMeta={FIELD_META}
                   onInputChange={updateInput}
@@ -941,7 +928,6 @@ function SimulatorPage({
                   onSave={saveScenario}
                   onReset={() => setInputs(normalizeInputs())}
                   onShowResults={() => jumpToSection('results')}
-                  formatCurrency={formatCurrency}
                   isMobile={isMobileViewport}
                 />
               </section>
@@ -1038,17 +1024,15 @@ function App() {
 
   if (route === '/form') {
     return (
-      <Suspense fallback={<RouteFallback />}>
-        <QuestionnaireRoute
-          inputs={inputs}
-          pricingModes={PRICING_MODES}
-          normalizeInputs={normalizeInputs}
-          onComplete={handleQuestionnaireComplete}
-          onExit={() => navigate('/')}
-          formatCurrency={formatCurrency}
-          formatNumber={formatNumber}
-        />
-      </Suspense>
+      <QuestionnaireRoute
+        inputs={inputs}
+        pricingModes={PRICING_MODES}
+        normalizeInputs={normalizeInputs}
+        onComplete={handleQuestionnaireComplete}
+        onExit={() => navigate('/')}
+        formatCurrency={formatCurrency}
+        formatNumber={formatNumber}
+      />
     )
   }
 
