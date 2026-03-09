@@ -23,12 +23,23 @@ function formatInputValue(value) {
   return value === null || value === undefined ? '' : String(value)
 }
 
+function formatDisplayNumber(value, decimals = 0) {
+  if (value === null || value === undefined || value === '') {
+    return ''
+  }
+
+  return new Intl.NumberFormat('fr-FR', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: decimals,
+  }).format(Number(value))
+}
+
 function parseInputNumber(rawValue) {
   if (rawValue.trim() === '') {
     return null
   }
 
-  const normalized = rawValue.replace(',', '.')
+  const normalized = rawValue.replace(/\s/g, '').replace(/\u202f/g, '').replace(',', '.')
   const parsed = Number(normalized)
   return Number.isFinite(parsed) ? parsed : null
 }
@@ -44,6 +55,13 @@ function Field({ field, value, onChange }) {
         }
       : {}
   const [inputValue, setInputValue] = useState(() => formatInputValue(value))
+  const [isEditing, setIsEditing] = useState(false)
+  const displayValue =
+    field.type === 'number'
+      ? isEditing
+        ? inputValue
+        : formatDisplayNumber(value, field.decimals ? 1 : 0)
+      : value
 
   useEffect(() => {
     setInputValue(formatInputValue(value))
@@ -58,6 +76,18 @@ function Field({ field, value, onChange }) {
     onChange(field.id, nextValue)
   }
 
+  function adjustNumericValue(direction) {
+    const currentValue = parseInputNumber(inputValue)
+    const fallbackValue = Number.isFinite(Number(value)) ? Number(value) : field.min ?? 0
+    const baseValue = currentValue ?? fallbackValue
+    const nextValue = Math.max(baseValue + (field.step ?? 1) * direction, field.min ?? Number.NEGATIVE_INFINITY)
+    setIsEditing(false)
+    setInputValue(formatInputValue(nextValue))
+    onChange(field.id, nextValue)
+  }
+
+  const isStepperField = field.type === 'number' && field.decimals
+
   return (
     <label className="space-y-2">
       <div className="flex items-center justify-between gap-3">
@@ -65,26 +95,57 @@ function Field({ field, value, onChange }) {
         {field.unit ? <span className="text-xs text-slate-400">{field.unit}</span> : null}
       </div>
       <div className="rounded-lg border border-slate-800 bg-slate-950 px-3 py-2.5 transition focus-within:border-cyan-500 focus-within:ring-2 focus-within:ring-cyan-500/15">
-        <input
-          type={field.type === 'number' ? 'text' : field.type}
-          value={field.type === 'number' ? inputValue : value}
-          onChange={(event) => {
-            if (field.type === 'number') {
-              setInputValue(event.target.value)
-              return
-            }
+        <div className="flex items-center gap-2">
+          <input
+            type={field.type === 'number' ? 'text' : field.type}
+            value={field.type === 'number' ? displayValue : value}
+            onFocus={() => {
+              if (field.type === 'number') {
+                setIsEditing(true)
+                setInputValue(formatInputValue(value))
+              }
+            }}
+            onChange={(event) => {
+              if (field.type === 'number') {
+                setInputValue(event.target.value)
+                return
+              }
 
-            onChange(field.id, event.target.value)
-          }}
-          onBlur={(event) => {
-            if (field.type === 'number') {
-              commitNumericValue(event.target.value)
-            }
-          }}
-          placeholder={field.placeholder}
-          className="w-full bg-transparent text-base text-slate-100 outline-none placeholder:text-slate-500"
-          {...commonProps}
-        />
+              onChange(field.id, event.target.value)
+            }}
+            onBlur={(event) => {
+              if (field.type === 'number') {
+                commitNumericValue(event.target.value)
+                setIsEditing(false)
+              }
+            }}
+            placeholder={field.placeholder}
+            className="w-full bg-transparent text-base text-slate-100 outline-none placeholder:text-slate-500"
+            {...commonProps}
+          />
+          {isStepperField ? (
+            <div className="flex shrink-0 items-center gap-1">
+              <button
+                type="button"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => adjustNumericValue(-1)}
+                className="cta-soft inline-flex h-9 w-9 items-center justify-center rounded-md text-base font-semibold"
+                aria-label={`Diminuer ${field.label}`}
+              >
+                -
+              </button>
+              <button
+                type="button"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => adjustNumericValue(1)}
+                className="cta-soft inline-flex h-9 w-9 items-center justify-center rounded-md text-base font-semibold"
+                aria-label={`Augmenter ${field.label}`}
+              >
+                +
+              </button>
+            </div>
+          ) : null}
+        </div>
       </div>
       {field.helper ? <p className="text-xs leading-5 text-slate-400">{field.helper}</p> : null}
     </label>
