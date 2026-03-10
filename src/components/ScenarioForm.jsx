@@ -211,11 +211,13 @@ export default function ScenarioForm({
   fieldMeta,
   onInputChange,
   onPricingModeChange,
+  onCopyShare,
   onSave,
   onReset,
   onShowResults,
   isMobile,
 }) {
+  const [shareCopied, setShareCopied] = useState(false)
   const rateTripletIds = new Set([
     'mortgageRate',
     'agencyFeePercent',
@@ -241,6 +243,14 @@ export default function ScenarioForm({
   const desktopFieldGrid = isMobile
     ? 'grid gap-3 sm:grid-cols-2'
     : 'grid gap-3 md:grid-cols-2 xl:grid-cols-12'
+
+  async function handleCopyShare() {
+    await onCopyShare()
+    setShareCopied(true)
+    window.setTimeout(() => {
+      setShareCopied(false)
+    }, 1600)
+  }
 
   return (
     <div className="space-y-4">
@@ -352,16 +362,27 @@ export default function ScenarioForm({
       <FormCard
         eyebrow="Actions"
         title="Validation du scénario"
-        description="Lancez les résultats, réinitialisez ou sauvegardez votre simulation."
+        description="Lancez les résultats, copiez le lien, réinitialisez ou sauvegardez votre simulation."
       >
         <div className="flex justify-center">
-          <div className="grid w-full max-w-4xl gap-2 sm:grid-cols-3">
+          <div className="grid w-full max-w-5xl gap-2 sm:grid-cols-2 xl:grid-cols-4">
             <button
               type="button"
               onClick={onShowResults}
               className="cta-primary min-h-11 rounded-lg px-4 text-sm font-semibold transition"
             >
               Voir les résultats
+            </button>
+            <button
+              type="button"
+              onClick={handleCopyShare}
+              className={`min-h-11 rounded-lg px-4 text-sm font-medium transition ${
+                shareCopied ? 'cta-copied' : 'cta-soft'
+              }`}
+            >
+              <span className={`inline-block ${shareCopied ? 'animate-[copy-pop_220ms_ease-out]' : ''}`}>
+                {shareCopied ? 'Copie effectuee' : 'Copier le lien'}
+              </span>
             </button>
             <button
               type="button"

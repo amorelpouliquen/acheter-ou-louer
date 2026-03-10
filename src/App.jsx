@@ -973,6 +973,24 @@ function SimulatorPage({
     }
   }
 
+  function copyCurrentScenarioShareUrl() {
+    const entry = {
+      id: crypto.randomUUID(),
+      name: inputs.scenarioName.trim() || 'Scenario en cours',
+      createdAt: new Date().toISOString(),
+      inputs,
+    }
+    const shareUrl = buildShareUrl(entry)
+
+    setLatestShare({ id: entry.id, url: shareUrl })
+
+    if (navigator.clipboard?.writeText) {
+      return navigator.clipboard.writeText(shareUrl).catch(() => undefined)
+    }
+
+    return Promise.resolve()
+  }
+
   function loadScenario(entry) {
     setInputs(normalizeInputs(entry.inputs))
     setActiveSection('params')
@@ -1045,6 +1063,7 @@ function SimulatorPage({
                   fieldMeta={FIELD_META}
                   onInputChange={updateInput}
                   onPricingModeChange={updatePricingMode}
+                  onCopyShare={copyCurrentScenarioShareUrl}
                   onSave={saveScenario}
                   onReset={() => setInputs(normalizeInputs())}
                   onShowResults={() => jumpToSection('results')}

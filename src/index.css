@@ -90,6 +90,17 @@ summary::-webkit-details-marker {
   background: rgba(71, 85, 105, 0.98);
 }
 
+.cta-copied {
+  background: rgba(8, 145, 178, 0.2);
+  color: #ecfeff;
+  border: 1px solid rgba(34, 211, 238, 0.75);
+  box-shadow: 0 10px 24px rgba(34, 211, 238, 0.18);
+}
+
+.cta-copied:hover {
+  background: rgba(14, 165, 233, 0.24);
+}
+
 .cta-selected {
   background: #94a3b8;
   color: #0f172a;
@@ -104,6 +115,7 @@ summary::-webkit-details-marker {
 .cta-primary,
 .cta-secondary,
 .cta-soft,
+.cta-copied,
 .cta-selected {
   transform: translateY(0);
   transition:
@@ -117,6 +129,7 @@ summary::-webkit-details-marker {
 .cta-primary:hover,
 .cta-secondary:hover,
 .cta-soft:hover,
+.cta-copied:hover,
 .cta-selected:hover {
   transform: translateY(-1px);
 }
@@ -124,9 +137,27 @@ summary::-webkit-details-marker {
 .cta-primary:focus-visible,
 .cta-secondary:focus-visible,
 .cta-soft:focus-visible,
+.cta-copied:focus-visible,
 .cta-selected:focus-visible {
   outline: 2px solid rgba(226, 232, 240, 0.85);
   outline-offset: 2px;
+}
+
+@keyframes copy-pop {
+  0% {
+    transform: scale(0.96);
+    opacity: 0.75;
+  }
+
+  70% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 @media (max-width: 640px) {

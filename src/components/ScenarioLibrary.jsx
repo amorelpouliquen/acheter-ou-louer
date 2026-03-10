@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 export default function ScenarioLibrary({
   savedScenarios,
   selectedIds,
@@ -9,15 +11,21 @@ export default function ScenarioLibrary({
   onToggle,
   formatCurrency,
 }) {
-  async function copyShareUrl(url) {
+  const [copiedId, setCopiedId] = useState(null)
+
+  async function copyShareUrl(id, url) {
     if (!navigator.clipboard?.writeText) {
       return
     }
 
     try {
       await navigator.clipboard.writeText(url)
+      setCopiedId(id)
+      window.setTimeout(() => {
+        setCopiedId((current) => (current === id ? null : current))
+      }, 1600)
     } catch {
-      // Ignore clipboard failures and keep the raw link visible.
+      // Ignore clipboard failures and leave the button unchanged.
     }
   }
 
@@ -38,7 +46,9 @@ export default function ScenarioLibrary({
       {latestShare ? (
         <div className="mb-4 rounded-xl border border-cyan-800/70 bg-cyan-950/30 p-3">
           <div className="text-sm font-semibold text-cyan-100">Lien de partage créé</div>
-          <div className="mt-1 break-all text-xs leading-5 text-cyan-200/80">{latestShare.url}</div>
+          <div className="mt-1 text-xs leading-5 text-cyan-200/80">
+            Utilise le bouton de copie du scénario pour le partager.
+          </div>
         </div>
       ) : null}
 
@@ -53,6 +63,7 @@ export default function ScenarioLibrary({
           const isSelected = selectedIds.includes(entry.id)
           const shareUrl = buildShareUrl(entry)
           const isLatestShare = latestShare?.id === entry.id
+          const isCopied = copiedId === entry.id
 
           return (
             <article key={entry.id} className="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
@@ -81,18 +92,16 @@ export default function ScenarioLibrary({
                   </div>
                   <button
                     type="button"
-                    onClick={() => copyShareUrl(shareUrl)}
-                    className="cta-soft min-h-9 w-full rounded-md px-3 text-xs transition sm:w-auto"
+                    onClick={() => copyShareUrl(entry.id, shareUrl)}
+                    className={`min-h-9 w-full rounded-md px-3 text-xs transition sm:w-auto ${
+                      isCopied ? 'cta-copied' : 'cta-soft'
+                    }`}
                   >
-                    Copier le lien
+                    <span className={`inline-block ${isCopied ? 'animate-[copy-pop_220ms_ease-out]' : ''}`}>
+                      {isCopied ? 'Copie effectuee' : 'Copier le lien'}
+                    </span>
                   </button>
                 </div>
-                <a
-                  href={shareUrl}
-                  className="mt-2 block break-all text-xs leading-5 text-cyan-300 underline decoration-cyan-800 underline-offset-2"
-                >
-                  {shareUrl}
-                </a>
               </div>
 
               <div className="mt-4 grid gap-2 sm:grid-cols-2">
